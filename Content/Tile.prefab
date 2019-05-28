@@ -1,0 +1,39 @@
+{
+	"ID": "b07e24e44f17e226d601259c1dabb141",
+	"TypeName": "FlaxEngine.Prefab",
+	"EngineBuild": 6176,
+	"Data": [
+	{
+		"TypeID": 3,
+		"ID": "a1e253834ce96941f6287698a3d1fdfe",
+		"ParentID": "00000000000000000000000000000000",
+		"Name": "Root"
+	},
+	{
+		"TypeID": "FlaxMinesweeper.MinesweeperTile",
+		"ID": "bfc9b75148e09500f7913ab39f674b08",
+		"ParentID": "a1e253834ce96941f6287698a3d1fdfe",
+		"V": {}
+	},
+	{
+		"TypeID": 1,
+		"ID": "badc414d484c382840c244a2609ff41e",
+		"ParentID": "a1e253834ce96941f6287698a3d1fdfe",
+		"Name": "Cube",
+		"Model": "b43f0f8f4aaba3f3156896a5a22ba493",
+		"Buffer": {
+			"Entries": [
+				{
+					"Material": "d51170934d7d00f2fc168a9a2e488d31"
+				}
+			]
+		}
+	},
+	{
+		"TypeID": "FlaxMinesweeper.MinesweeperTile",
+		"ID": "02b5bdfe44c2f3adfa8e06a43417a571",
+		"ParentID": "badc414d484c382840c244a2609ff41e",
+		"V": {}
+	}
+]
+}
