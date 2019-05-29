@@ -10,7 +10,7 @@ namespace FlaxMinesweeper
     {
         // TODO: Custom editor with butt-ons
         [NoSerialize]
-        public List<Action> Actions = new List<Action>();
+        public Dictionary<string, Action> Actions = new Dictionary<string, Action>();
         private void Start()
         {
             // Types: Get/Creates a SimpleTweenScript
@@ -24,102 +24,131 @@ namespace FlaxMinesweeper
 
             // TODO: .Sequence()?
             // 0
-            Actions.Add(() =>
+            Actions.Add("Simple Move", () =>
             {
                 SimpleTween
                     .Tween(this.Actor)
                     .MoveTo(new Vector3(0, -100, 0), 2);
             });
-            return;
-
             // 1
-            this.Actor.Tween()
-                .MoveTo(new Vector3(0, -100, 0), 2)
-                .SetRepetitions(2);
-
+            Actions.Add("Simple Move and repeat", () =>
+            {
+                this.Actor.Tween()
+                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .SetRepetitions(2);
+            });
             // 2
-            SimpleTween
-                .Tween(this.Actor)
-                .MoveTo(new Vector3(0, -100, 0), 2)
-                .SetRepetitions(2);
-
+            Actions.Add("Simple Move and repeat (API)", () =>
+            {
+                SimpleTween
+                    .Tween(this.Actor)
+                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .SetRepetitions(2);
+            });
             // 3
-            SimpleTween
-                .MoveTo(this.Actor, new Vector3(0, -100, 0), 2);
-
+            Actions.Add("Simple Move (API)", () =>
+            {
+                SimpleTween
+                    .MoveTo(this.Actor, new Vector3(0, -100, 0), 2);
+            });
             // 4
-            SimpleTween
-                .MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
-                .SetFrom(new Vector3(0, 0, 0))
-                .SetReversed()
-                //.Chain()
-                .MoveTo(new Vector3(0, -100, 0), 2);
-
+            Actions.Add("Chain Move and reverse", () =>
+            {
+                SimpleTween
+                    .MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
+                    .SetFrom(new Vector3(0, 0, 0))
+                    .SetReversed()
+                    //.Chain()
+                    .MoveTo(new Vector3(0, -100, 0), 2);
+            });
             // 5
-            var x = SimpleTween
-                .MoveTo(this.Actor, new Vector3(0, -100, 0), 2);
+            Actions.Add("Simple Move and cancel", () =>
+            {
+                var x = SimpleTween
+                    .MoveTo(this.Actor, new Vector3(0, -100, 0), 2);
 
-            SimpleTween
-                .Tween(this.Actor)
-                .Wait(3, () => x.Cancel());
-
+                SimpleTween
+                    .Tween(this.Actor)
+                    .Wait(1, () => x.Cancel());
+            });
             // 6
+            Actions.Add("NOT IMPLEMENTED", () =>
+            {
+            });
 
             // 7
-            var y = SimpleTween
-                .MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
-                .SetFrom(new Vector3(0, 0, 0))
-                .SetReversed()
-                //.Chain()
-                .MoveTo(new Vector3(0, -100, 0), 2);
+            Actions.Add("Chain Move and cancel", () =>
+            {
+                var y = SimpleTween
+                    .MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
+                    .SetFrom(new Vector3(0, 0, 0))
+                    .SetReversed()
+                    //.Chain()  
+                    .MoveTo(new Vector3(0, -100, 0), 2);
 
-            y.Cancel();
-
+                y.Cancel();
+            });
             // 8
-            SimpleTween
-                .Tween(this.Actor)
-                .Finish();
-
+            Actions.Add("Tween and finish", () =>
+            {
+                SimpleTween
+                    .Tween(this.Actor)
+                    .Finish();
+            });
             // 9
-            var x1 = SimpleTween
-                .MoveTo(this.Actor, new Vector3(0, -100, 0), 2);
+            Actions.Add("WIP Set Percentage", () =>
+            {
+                var x1 = SimpleTween
+                    .MoveTo(this.Actor, new Vector3(0, -100, 0), 2);
 
-            //x1.Percentage = 0.5f;
-
+                //x1.Percentage = 0.5f;
+            });
             // 10
-            SimpleTween
-                .MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
-                .Wait(2) // Acts like .Sequence()? (At least the return value does?)
-                .MoveTo(new Vector3(0, -100, 0), 2); // Uh...
-
+            Actions.Add("Move, wait and move", () =>
+            {
+                SimpleTween
+                    .MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
+                    .Wait(2) // Acts like .Sequence()? (At least the return value does?)
+                    .MoveTo(new Vector3(0, -100, 0), 2); // Uh...
+            });
             // 11
-            //SimpleTween
-            //	.MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
-            //	.OnFinished((x2) => x2.Repeat());
-
+            Actions.Add("NOT IMPLEMENTED 2", () =>
+            {
+                //SimpleTween
+                //	.MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
+                //	.OnFinished((x2) => x2.Repeat());
+            });
             // 12
-            SimpleTween
-                .MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
-                .MoveTo(new Vector3(0, -100, 0), 2)
-                .MoveTo(new Vector3(0, -100, 0), 2)
-                .Sequence
-                .SetRepetitions(3);
-
+            Actions.Add("Multiple Moves and repeat", () =>
+            {
+                SimpleTween
+                    .MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
+                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .Sequence
+                    .SetRepetitions(3);
+            });
             // 13
-            var seq = SimpleTween
-                .CreateSequence<Actor>()
-                .MoveTo(new Vector3(0, -100, 0), 2)
-                .MoveTo(new Vector3(0, -100, 0), 2)
-                .MoveTo(new Vector3(0, -100, 0), 2)
-                .Sequence
-                .SetRepetitions(3);
+            Actions.Add("Create sequence and add to actor", () =>
+            {
+                var seq = SimpleTween
+                    .CreateSequence<Actor>()
+                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .Sequence
+                    .SetRepetitions(3);
 
-            SimpleTween
-                .Add(seq, this.Actor);
+                SimpleTween
+                    .Add(seq, this.Actor);
 
-            Debug.Log("BeforeAdd");
-            Actor.AddScript<TestEnable>();
-            Debug.Log("AfterAdd");
+                Debug.Log("BeforeAdd");
+                Actor.AddScript<TestEnable>();
+                Debug.Log("AfterAdd");
+            });
+
+
+
 
             /*Actor
                 .Tween()*/
