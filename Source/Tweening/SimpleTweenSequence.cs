@@ -66,14 +66,16 @@ namespace FlaxMinesweeper.Source.Tweening
 
         protected override void OnUpdate()
         {
-            _actions.RemoveAll(a => a.Done);
-
             // Send the update event to all children
             // TODO: Optimisation: only the ones that are currently active
             foreach (var action in _actions)
             {
                 action.Update(LocalTime);
             }
+
+
+            // Every animation deserves to be played once (so that it's in the end state)
+            _actions.RemoveAll(a => a.Done);
         }
     }
 

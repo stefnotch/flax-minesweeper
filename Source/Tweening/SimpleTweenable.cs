@@ -90,6 +90,10 @@ namespace FlaxMinesweeper.Source.Tweening
                 Percentage = IsReversedLoop ? 1 - Percentage : Percentage;
             }
 
+            if (this.Sequence != null)
+            {
+                Debug.Log("P" + Percentage);
+            }
             OnUpdate();
         }
 
