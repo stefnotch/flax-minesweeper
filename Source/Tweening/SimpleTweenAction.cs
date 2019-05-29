@@ -40,9 +40,9 @@ namespace FlaxMinesweeper.Source.Tweening
             return Sequence.ScaleTo(to, duration, startDelay);
         }
 
-        public SimpleTweenAction<Actor> Wait(float timeInSeconds, Action callback = null)
+        public SimpleTweenAction<U> Wait(float duration, Action<SimpleTweenAction<U, float>> callback = null)
         {
-            return this.Sequence.Wait(timeInSeconds, callback);
+            return Sequence.Wait(duration, callback);
         }
 
         #endregion Actions
@@ -102,9 +102,13 @@ OnUpdate(TweenCallback callback)
 OnWaypointChange(TweenCallback<int> callback)
 */
 
-        public SimpleTweenAction<U, T> OnFinished(Action<SimpleTweenAction<U, T>> onFinished)
+        public SimpleTweenAction<U, T> OnEnd(Action<SimpleTweenAction<U, T>> onEnd)
         {
-            throw new NotImplementedException();
+            if (onEnd == null)
+            {
+                throw new ArgumentNullException(nameof(onEnd));
+            }
+            EndEvent += (tweenAble) => onEnd(tweenAble as SimpleTweenAction<U, T>);
             return this;
         }
 
@@ -143,7 +147,7 @@ OnWaypointChange(TweenCallback<int> callback)
 
         public SimpleTweenAction<U, T> SetReversed(bool reversed = true)
         {
-            _options.Reversed = reversed;
+            this.Options.Reversed = reversed;
             return this;
         }
 

@@ -113,6 +113,13 @@ namespace FlaxMinesweeper.Source.Tweening
             return AddTweenAction(to, duration, startDelay, SimpleTweenFunctions.ScaleLocal<U>, SimpleTweenFunctions.GetLocalScale, SimpleTweenFunctions.GetLocalScale);
         }
 
+        public SimpleTweenAction<U> Wait(float duration, Action<SimpleTweenAction<U, float>> callback = null)
+        {
+            var tweenAction = AddTweenAction(1f, duration, null, SimpleTweenFunctions.Nothing<U>, SimpleTweenFunctions.GetZero, SimpleTweenFunctions.GetOne);
+            tweenAction.OnEnd(callback);
+            return tweenAction;
+        }
+
         private SimpleTweenAction<U, T> AddTweenAction<T>(T to, float duration, float? startDelay, Action<SimpleTweenAction<U, T>> tweenFunction, Func<U, T> defaultFromValue = null, Func<U, T> defaultToValue = null)
         {
             float? previousEndTime = _actions.DefaultIfEmpty(null).LastOrDefault()?.EndTime;
@@ -137,11 +144,6 @@ namespace FlaxMinesweeper.Source.Tweening
                 }
             }
             return tweenAction;
-        }
-
-        public SimpleTweenAction<Actor> Wait(float duration, Action callback = null)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion Actions
@@ -169,6 +171,24 @@ namespace FlaxMinesweeper.Source.Tweening
         public SimpleTweenSequence<U> SetLoopType(LoopType loopType)
         {
             this.Options.LoopType = loopType;
+            return this;
+        }
+
+        public SimpleTweenSequence<U> SetReversed(bool reversed = true)
+        {
+            this.Options.Reversed = reversed;
+            return this;
+        }
+
+        public SimpleTweenSequence<U> SetStartDelay(float startDelay)
+        {
+            this.StartTime = (Sequence?.LocalTime ?? ParentTime) + startDelay;
+            return this;
+        }
+
+        public SimpleTweenSequence<U> SetStartTime(float startTime)
+        {
+            this.StartTime = startTime;
             return this;
         }
 

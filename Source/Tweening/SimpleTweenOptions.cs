@@ -29,18 +29,8 @@ namespace FlaxMinesweeper.Source.Tweening
         public LoopType LoopType = LoopType.Loop; // Used
         public bool IsLocal = true;
         public bool IsPhysics = false;
-        public bool Reversed = false;
+        public bool Reversed = false; // Used
         public LerpType LerpType = LerpType.Lerp; // Used
         public AlphaBlendMode EasingType = AlphaBlendMode.Linear; // Used
-
-        /*
-    // TODO: Or refactor to events?
-    // I don't have to worry about disposing them:
-
-    public Action TweenStarted;//done
-
-    public Action<float> TweenUpdate;//done
-
-    public Action TweenEnded;*/
     }
 }

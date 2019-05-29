@@ -62,15 +62,21 @@ namespace FlaxMinesweeper
                     //.Chain()
                     .MoveTo(new Vector3(0, -100, 0), 2);
             });
+            // TODO: We've reached this point vvv
             // 5
             Actions.Add("Simple Move and cancel", () =>
             {
                 var x = SimpleTween
                     .MoveTo(this.Actor, new Vector3(0, -100, 0), 2);
 
+                //TODO: Hold up, shouldn't this create a new sequence? Or nah.
+                // TODO: A cute syntax to quickly create a new sequence
+
+                // TODO: This has to create a new sequence. Discussion's over. 
+                // Otherwise, this would happen AFTER the MoveTo. Which is weird.
                 SimpleTween
                     .Tween(this.Actor)
-                    .Wait(1, () => x.Cancel());
+                    .Wait(1, (_) => { Debug.Log("Cancel"); x.Cancel(); });
             });
             // 6
             Actions.Add("NOT IMPLEMENTED", () =>

@@ -24,6 +24,25 @@ namespace FlaxMinesweeper.Source.Tweening
         private float _currentPauseStartTime;
         private SimpleTweenSequence _parent;
 
+        // TODO: https://github.com/thomaslevesque/WeakEvent
+        protected event Action<SimpleTweenable> EndEvent;
+        /*Tweening: Callbacks/events for
+       - Starting?
+       - Updating?
+       - Pause?
+       - End!
+
+
+       OnComplete(TweenCallback callback)
+       OnKill(TweenCallback callback)
+       OnPlay(TweenCallback callback)
+       OnPause(TweenCallback callback)
+       OnRewind(TweenCallback callback)
+       OnStart(TweenCallback callback)
+       OnStepComplete(TweenCallback callback)
+       OnUpdate(TweenCallback callback)
+       OnWaypointChange(TweenCallback<int> callback)*/
+
         public SimpleTweenable(SimpleTweenSequence parent = null)
         {
             Sequence = parent;
@@ -57,7 +76,7 @@ namespace FlaxMinesweeper.Source.Tweening
 
 
         public float EndTime => StartTime + PauseTime + Duration;
-        public bool IsReversedLoop => Options.LoopType == LoopType.PingPong && RawPercentage % 2 > 1;
+        public bool IsReversedLoop => Options.Reversed ^ (Options.LoopType == LoopType.PingPong && RawPercentage % 2 > 1);
         public bool Done => ParentTime >= EndTime;
         public SimpleTweenSequence Sequence { get => _parent; set { ParentChanged(value, _parent); _parent = value; } }
 
@@ -75,7 +94,8 @@ namespace FlaxMinesweeper.Source.Tweening
             LocalTime = (ParentTime - StartTime - PauseTime) * Scale;
             RawPercentage = LocalTime / Duration;
 
-            if (Done)
+            bool isDone = Done;
+            if (isDone)
             {
                 Percentage = IsReversedLoop ? 0 : 1;
             }
@@ -90,12 +110,16 @@ namespace FlaxMinesweeper.Source.Tweening
                 Percentage = IsReversedLoop ? 1 - Percentage : Percentage;
             }
 
-            if (this.Sequence != null)
-            {
-                Debug.Log("P" + Percentage);
-            }
             OnUpdate();
+
+            if (isDone)
+            {
+                EndEvent?.Invoke(this);
+            }
         }
+
+        // TODO: Return self
+        // So that you can write .Cancel() /*cancel the previous garbage*/ .MoveTo() /*do this instead*/
 
         /// <summary>
         /// Forcibly finishes an animation
@@ -168,6 +192,10 @@ namespace FlaxMinesweeper.Source.Tweening
         }
 
         protected abstract void OnUpdate();
+
+
+
+
 
         /*
          
