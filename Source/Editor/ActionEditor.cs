@@ -19,7 +19,15 @@ namespace FlaxMinesweeper.Source.Editor
                 if (!HasDifferentValues)
                 {
                     var action = Values[0] as Action;
-                    action?.Invoke();
+                    try
+                    {
+                        action?.Invoke();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                        throw;
+                    }
                 }
             };
         }

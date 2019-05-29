@@ -87,8 +87,8 @@ public static SimpleTweenSequence<U> Wait<U>()
         private void OnDestroy()
         {
             _tweenSequence.Cancel();
-            this.Actor.RemoveScript(this);
-            FlaxEngine.Object.Destroy(this);
+            //this.Actor.RemoveScript(this);
+            //FlaxEngine.Object.Destroy(this);
         }
     }
 

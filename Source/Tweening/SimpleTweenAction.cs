@@ -110,10 +110,14 @@ OnWaypointChange(TweenCallback<int> callback)
 
         #region Modify Options
 
+        /// <summary>
+        /// Sets the scale
+        /// </summary>
+        /// <param name="repetitionCount"></param>
+        /// <returns></returns>
         public SimpleTweenAction<U, T> SetRepetitions(int repetitionCount)
         {
-            throw new NotImplementedException();
-            //this.LoopOptions.Repetitions = repetitionCount;
+            this.Scale = repetitionCount;
             return this;
         }
 

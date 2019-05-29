@@ -103,14 +103,18 @@ namespace FlaxMinesweeper.Source.Tweening
             // TODO: Should I mess around with the StartTime or the Duration?
 
             // TODO: Notify parent that this animation has been finished?
-            throw new NotImplementedException();
+
+            // TODO: Or should I wait until the next Update() call?
+
+            // I'm just going to force a finish update and then cancel the animation
             Update(EndTime);
+            Cancel();
         }
 
         public virtual void Cancel()
         {
-            // TODO: Notify parent that this animation has been cancelled
-            throw new NotImplementedException();
+            // Notify parent that this animation has been cancelled
+            Sequence?.ChildRemoved(this);
         }
 
         protected virtual void FinishChild(SimpleTweenable child)

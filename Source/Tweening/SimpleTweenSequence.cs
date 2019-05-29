@@ -25,9 +25,9 @@ namespace FlaxMinesweeper.Source.Tweening
         public override void Cancel()
         {
             // Cancel the children
-            foreach (var action in _actions)
+            for (int i = _actions.Count - 1; i >= 0; i--)
             {
-                action.Cancel();
+                _actions[i].Cancel();
             }
             _actions.Clear(); // TODO: Clear?
 
@@ -160,8 +160,7 @@ namespace FlaxMinesweeper.Source.Tweening
 
         public SimpleTweenSequence<U> SetRepetitions(int repetitionCount)
         {
-            throw new NotImplementedException();
-            //this.LoopOptions.Repetitions = repetitionCount;
+            this.Scale = repetitionCount;
             return this;
         }
 

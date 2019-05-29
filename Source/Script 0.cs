@@ -24,11 +24,12 @@ namespace FlaxMinesweeper
 
             // TODO: .Sequence()?
             // 0
-            Actions.Add("Simple Move", () =>
+            Actions.Add("Reset", () =>
             {
+                // TODO: Doesn't seem to work yet
                 SimpleTween
                     .Tween(this.Actor)
-                    .MoveTo(new Vector3(0, -100, 0), 2);
+                    .MoveTo(new Vector3(0, 0, 0), 0);
             });
             // 1
             Actions.Add("Simple Move and repeat", () =>
