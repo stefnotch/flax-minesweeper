@@ -8,6 +8,9 @@ namespace FlaxMinesweeper
 {
     public class Script0 : Script
     {
+        // TODO: Custom editor with butt-ons
+        [NoSerialize]
+        public List<Action> Actions = new List<Action>();
         private void Start()
         {
             // Types: Get/Creates a SimpleTweenScript
@@ -21,9 +24,12 @@ namespace FlaxMinesweeper
 
             // TODO: .Sequence()?
             // 0
-            SimpleTween
-                .Tween(this.Actor)
-                .MoveTo(new Vector3(0, -100, 0), 2);
+            Actions.Add(() =>
+            {
+                SimpleTween
+                    .Tween(this.Actor)
+                    .MoveTo(new Vector3(0, -100, 0), 2);
+            });
             return;
 
             // 1
