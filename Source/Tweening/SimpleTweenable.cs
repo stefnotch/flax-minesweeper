@@ -7,7 +7,7 @@ using FlaxEngine;
 
 namespace FlaxMinesweeper.Source.Tweening
 {
-    public abstract class SimpleTweenable
+    public abstract class SimpleTweenable : IComparable<SimpleTweenable>
     {
         private float _startTime;
         private float _scale = 1f;
@@ -192,6 +192,11 @@ namespace FlaxMinesweeper.Source.Tweening
         }
 
         protected abstract void OnUpdate();
+
+        public int CompareTo(SimpleTweenable other)
+        {
+            return StartTime.CompareTo(other.StartTime);
+        }
 
 
 

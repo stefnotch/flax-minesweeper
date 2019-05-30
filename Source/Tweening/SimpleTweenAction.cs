@@ -23,6 +23,18 @@ namespace FlaxMinesweeper.Source.Tweening
             set => base.Sequence = value;
         }
 
+        /// <summary>
+        /// Creates a new sibling-sequence
+        /// </summary>
+        /// <returns>The new sequence</returns>
+        public SimpleTweenSequence<U> NewSequence()
+        {
+            return Sequence.NewSequence();
+            // TODO: This HAS to be behave identical to
+            //return Sequence.Add(new SimpleTweenSequence<U>(Sequence.Target, null));
+        }
+
+
         #region Actions
 
         public SimpleTweenAction<U, Vector3> MoveTo(Vector3 to, float duration, float? startDelay = null)

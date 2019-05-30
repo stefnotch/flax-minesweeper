@@ -8,16 +8,25 @@ namespace FlaxMinesweeper.Source.Tweening
 {
     public static class SimpleTween
     {
-        public static SimpleTweenSequence<U> Tween<U>(this U actor) where U : Actor
+        private static SimpleTweenSequence<U> GetSequence<U>(U actor) where U : Actor
         {
             // TODO: Performance of this code?
             var tweenScript = actor.GetScript<SimpleTweenScript>();
             if (!tweenScript)
             {
                 tweenScript = actor.AddScript<SimpleTweenScript>();
+                if (!tweenScript) throw new FlaxException($"Creating a {nameof(SimpleTweenScript)} failed");
                 tweenScript.Init<U>();
             }
-            return (SimpleTweenSequence<U>)tweenScript.TweenSequence;
+            return tweenScript.TweenSequence as SimpleTweenSequence<U>;
+        }
+
+        public static SimpleTweenSequence<U> Tween<U>(this U actor) where U : Actor
+        {
+            var newSequence = GetSequence(actor).NewSequence();
+            newSequence.Duration = float.PositiveInfinity; // Unlike the parent sequence, this one is susceptible to being removed
+            // TODO: ^ Destroy that sequence when the kids are done. For that: Create a new class: ContainerSequence
+            return newSequence;
         }
 
         public static SimpleTweenAction<Actor, Vector3> MoveTo(Actor actor, Vector3 to, float duration)
@@ -44,7 +53,7 @@ namespace FlaxMinesweeper.Source.Tweening
         public static SimpleTweenSequence<U> Add<U>(SimpleTweenable simpleTweenable, U actor) where U : Actor
         {
             // TODO: Optimize the case where the actor doesn't have a SimpleTweenScript??
-            var seq = Tween(actor);
+            var seq = GetSequence(actor);
             seq.Add(simpleTweenable);
             return seq;
         }

@@ -26,7 +26,11 @@ namespace FlaxMinesweeper
             // 0
             Actions.Add("Reset", () =>
             {
-                // TODO: Doesn't seem to work yet
+                SimpleTween
+                    .Tween(this.Actor)
+                    .Sequence
+                    .Cancel();
+
                 SimpleTween
                     .Tween(this.Actor)
                     .MoveTo(new Vector3(0, 0, 0), 0);
@@ -62,21 +66,17 @@ namespace FlaxMinesweeper
                     //.Chain()
                     .MoveTo(new Vector3(0, -100, 0), 2);
             });
-            // TODO: We've reached this point vvv
             // 5
             Actions.Add("Simple Move and cancel", () =>
             {
                 var x = SimpleTween
                     .MoveTo(this.Actor, new Vector3(0, -100, 0), 2);
 
-                //TODO: Hold up, shouldn't this create a new sequence? Or nah.
-                // TODO: A cute syntax to quickly create a new sequence
-
-                // TODO: This has to create a new sequence. Discussion's over. 
+                // This has to create a new sequence. Discussion's over. 
                 // Otherwise, this would happen AFTER the MoveTo. Which is weird.
                 SimpleTween
                     .Tween(this.Actor)
-                    .Wait(1, (_) => { Debug.Log("Cancel"); x.Cancel(); });
+                    .Wait(1, (_) => x.Cancel());
             });
             // 6
             Actions.Add("NOT IMPLEMENTED", () =>
@@ -84,26 +84,26 @@ namespace FlaxMinesweeper
             });
 
             // 7
-            Actions.Add("Chain Move and cancel", () =>
+            Actions.Add("Chain Move and instant cancel", () =>
             {
                 var y = SimpleTween
                     .MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
                     .SetFrom(new Vector3(0, 0, 0))
                     .SetReversed()
                     //.Chain()  
-                    .MoveTo(new Vector3(0, -100, 0), 2);
+                    .MoveTo(new Vector3(-100, -100, 0), 2);
 
-                y.Cancel();
+                y.Sequence.Cancel();
             });
             // 8
-            Actions.Add("Tween and finish", () =>
+            Actions.Add("Tween and instant finish", () =>
             {
                 SimpleTween
                     .Tween(this.Actor)
                     .Finish();
             });
             // 9
-            Actions.Add("WIP Set Percentage", () =>
+            Actions.Add("NOT IMPLEMENTED Set Percentage", () =>
             {
                 var x1 = SimpleTween
                     .MoveTo(this.Actor, new Vector3(0, -100, 0), 2);
@@ -116,7 +116,7 @@ namespace FlaxMinesweeper
                 SimpleTween
                     .MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
                     .Wait(2) // Acts like .Sequence()? (At least the return value does?)
-                    .MoveTo(new Vector3(0, -100, 0), 2); // Uh...
+                    .MoveTo(new Vector3(-100, -50, 0), 2); // Uh...
             });
             // 11
             Actions.Add("NOT IMPLEMENTED 2", () =>
@@ -125,18 +125,19 @@ namespace FlaxMinesweeper
                 //	.MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
                 //	.OnFinished((x2) => x2.Repeat());
             });
+            // TODO: We've reached this point vvv
             // 12
             Actions.Add("Multiple Moves and repeat", () =>
             {
                 SimpleTween
                     .MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
-                    .MoveTo(new Vector3(0, -100, 0), 2)
-                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .MoveTo(new Vector3(100, -100, 0), 2)
+                    .MoveTo(new Vector3(100, 0, 0), 2)
                     .Sequence
-                    .SetRepetitions(3);
+                    .SetRepetitions(3); // TODO: This doesn't work...
             });
             // 13
-            Actions.Add("Create sequence and add to actor", () =>
+            Actions.Add("NOT IMPLEMENTED Create sequence and add to actor", () =>
             {
                 var seq = SimpleTween
                     .CreateSequence<Actor>()
@@ -148,10 +149,6 @@ namespace FlaxMinesweeper
 
                 SimpleTween
                     .Add(seq, this.Actor);
-
-                Debug.Log("BeforeAdd");
-                Actor.AddScript<TestEnable>();
-                Debug.Log("AfterAdd");
             });
 
 

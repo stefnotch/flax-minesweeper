@@ -12,15 +12,24 @@ namespace FlaxMinesweeper.Source.Tweening
     /// </summary>
     public abstract class SimpleTweenSequence : SimpleTweenable
     {
+        /* Minor Redesign:
+        * ContainerSequence: (Doesn't bother calculating the percentage?)
+        * - Duration: max(child.EndTime)
+        * - Scale: If it's more than 1, the LocalTime **that** gets passed in the Update() function wraps around
+        * - All Sequences are ContainerSequences. Because the other one doesn't make sense.
+        * 
+        */
 
-        // TODO: Sort the list of actions by their start time
-        // A LinkedList + a reference to the current action might be faster?
-        protected readonly List<SimpleTweenable> _actions = new List<SimpleTweenable>();
+        // TODO: If DestroyOnFinish = true, switch to a wrap-around list, where old actions get overwritten
+        protected int Index = 0;
+        protected readonly List<SimpleTweenable> _actions = new List<SimpleTweenable>(); // Or an interval tree?
 
         protected SimpleTweenSequence(SimpleTweenSequence parent = null) : base(parent)
         {
 
         }
+
+        public bool DestroyOnFinish { get; set; } = true;
 
         public override void Cancel()
         {
@@ -29,7 +38,12 @@ namespace FlaxMinesweeper.Source.Tweening
             {
                 _actions[i].Cancel();
             }
-            _actions.Clear(); // TODO: Clear?
+
+            if (DestroyOnFinish)
+            {
+                _actions.Clear();
+                //this.EndEvent = null; // TODO: Also remove the event
+            }
 
             // Cancel self
             base.Cancel();
@@ -42,7 +56,11 @@ namespace FlaxMinesweeper.Source.Tweening
             {
                 action.Finish();
             }
-            _actions.Clear(); // TODO: Clear?
+            if (DestroyOnFinish)
+            {
+                _actions.Clear();
+                //this.EndEvent = null; // TODO: Also remove the event
+            }
 
             // Finish self
             base.Finish();
@@ -50,32 +68,61 @@ namespace FlaxMinesweeper.Source.Tweening
 
         protected override void ChildRemoved(SimpleTweenable child)
         {
+            // TODO: Optimize this
             _actions.Remove(child);
         }
 
         protected override void ChildAdded(SimpleTweenable child)
         {
+            // TODO: Optimize this
             _actions.Add(child);
+            //_actions.Sort(); // TODO: Notify the parent (this) when the StartTime changes
+            if (child.EndTime > Duration)
+            {
+                Duration = child.EndTime;
+            }
         }
 
-        // TODO: return this so that this method call can be chained?
-        public void Add(SimpleTweenable simpleTweenable)
+        public TweenAble Add<TweenAble>(TweenAble simpleTweenable) where TweenAble : SimpleTweenable
         {
+            // TODO: Check if the child actually fits into this sequence.
             simpleTweenable.Sequence = this;
+            return simpleTweenable;
         }
 
         protected override void OnUpdate()
         {
             // Send the update event to all children
             // TODO: Optimisation: only the ones that are currently active
+            float maxEndTime = -1f;
             foreach (var action in _actions)
             {
-                action.Update(LocalTime);
+                if (Scale > 1)
+                {
+                    // Wrap around local time
+                    action.Update(LocalTime % Duration);
+                }
+                else
+                {
+                    action.Update(LocalTime);
+                }
+
+                float endTime = action.EndTime;
+                if (endTime > maxEndTime)
+                {
+                    maxEndTime = endTime;
+                }
             }
 
+            Duration = maxEndTime; // TODO: Or notify the parent whenever a Startime/(pause?)/Duration changes
+
+            if (Done && DestroyOnFinish)
+            {
+                _actions.Clear();
+            }
 
             // Every animation deserves to be played once (so that it's in the end state)
-            _actions.RemoveAll(a => a.Done);
+            //_actions.RemoveAll(a => a.Done);
         }
     }
 
@@ -87,7 +134,7 @@ namespace FlaxMinesweeper.Source.Tweening
     {
         // TODO: Target Actor?
         // TODO: Get this from the parent as well?
-        protected U _target;
+        protected readonly U _target;
 
         public SimpleTweenSequence(U target, SimpleTweenSequence parent = null) : base(parent)
         {
@@ -95,6 +142,17 @@ namespace FlaxMinesweeper.Source.Tweening
         }
 
         public U Target => _target;
+
+        /// <summary>
+        /// Creates a new child-sequence
+        /// </summary>
+        /// <returns>The new sequence</returns>
+        public SimpleTweenSequence<U> NewSequence()
+        {
+            return new SimpleTweenSequence<U>(Target, this);
+            // TODO: This HAS to be behave identical to
+            //return Add(new SimpleTweenSequence<U>(Target, null));
+        }
 
         #region Actions
 
@@ -116,7 +174,7 @@ namespace FlaxMinesweeper.Source.Tweening
         public SimpleTweenAction<U> Wait(float duration, Action<SimpleTweenAction<U, float>> callback = null)
         {
             var tweenAction = AddTweenAction(1f, duration, null, SimpleTweenFunctions.Nothing<U>, SimpleTweenFunctions.GetZero, SimpleTweenFunctions.GetOne);
-            tweenAction.OnEnd(callback);
+            if (callback != null) tweenAction.OnEnd(callback);
             return tweenAction;
         }
 
