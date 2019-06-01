@@ -79,6 +79,11 @@ namespace FlaxMinesweeper.Source.Tweening
             // TODO: Optimize this
             _actions.Add(child);
             //_actions.Sort(); // TODO: Notify the parent (this) when the StartTime changes
+            ChildEndTimeChanged(child);
+        }
+
+        protected override void ChildEndTimeChanged(SimpleTweenable child)
+        {
             if (child.EndTime > base.Duration)
             {
                 base.Duration = child.EndTime;

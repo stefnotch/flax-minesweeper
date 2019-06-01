@@ -178,5 +178,11 @@ OnWaypointChange(TweenCallback<int> callback)
             }
             _tweenFunction(this);
         }
+
+        protected override void OnDone()
+        {
+            base.OnDone();
+            Debug.Log("Done...");
+        }
     }
 }
