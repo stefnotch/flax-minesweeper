@@ -8,21 +8,11 @@ namespace FlaxMinesweeper
 {
     public class Script0 : Script
     {
-        // TODO: Custom editor with butt-ons
         [NoSerialize]
         public Dictionary<string, Action> Actions = new Dictionary<string, Action>();
+
         private void Start()
         {
-            // Types: Get/Creates a SimpleTweenScript
-            // this.Actor.Tween() and SimpleTween(this.Actor)
-
-            // Types: Creates a new SimpleTweenAction { script = SimpleTweenScript, settings = SimpleTweenSettings }
-            // MoveTo, ScaleTo, (Wait?)
-
-            // Modifies the current action.settings (Prefix with Set? Like SetReverse, SetRepeat)
-            // Reverse, Repeat, Wait (modifies the delay AFTER the end? Or should we think up a better name so that ti can modify the delay **before** the start)
-
-            // TODO: .Sequence()?
             // 0
             Actions.Add("Reset", () =>
             {
@@ -79,8 +69,12 @@ namespace FlaxMinesweeper
                     .Wait(1, (_) => x.Cancel());
             });
             // 6
-            Actions.Add("NOT IMPLEMENTED", () =>
+            Actions.Add("Start time with startDelay", () =>
             {
+                var y = SimpleTween
+                    .MoveTo(this.Actor, new Vector3(0, -100, 0), duration: 2) // Move for 2 seconds
+                    .ScaleTo(new Vector3(2, 2, 1), duration: 1, startDelay: 0) // While scaling the object up
+                    .ScaleTo(new Vector3(1, 1, 1), duration: 1); // Now scale the object down. This happens after **the previous tween**
             });
 
             // 7
@@ -150,9 +144,30 @@ namespace FlaxMinesweeper
                 SimpleTween
                     .Add(seq, this.Actor);
             });
-
-
-
+            // 14
+            Actions.Add("Single Animation Additive Mode", () =>
+            {
+                SimpleTween
+                    .Tween(Actor)
+                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .SetAdditive(true);
+            });
+            // 15
+            /*Actions.Add("Multile Animations with Additive Mode", () =>
+            {
+                SimpleTween
+                    .Tween(Actor)
+                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .SetAdditive(true);
+            });
+            // 16
+            Actions.Add("Multile Animations including Additive Mode", () =>
+            {
+                SimpleTween
+                    .Tween(Actor)
+                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .SetAdditive(true);
+            });*/
 
             /*Actor
                 .Tween()*/
@@ -170,19 +185,6 @@ namespace FlaxMinesweeper
                         .ScaleTo(Actor, new Vector3(2), 2);
                 });
                 */
-            // Here you can add code that needs to be called when script is created
-            //var ta = TweenAction<Vector3>.Create(Vector3.Zero, Vector3.One, 1, (a, b, c) => a);
-
-            //this.Actor.AddScript(ta);
-
-            //var test = New<GenericScript<Vector3>>();
-            //this.Actor.AddScript(test);
-
-            //var otherTest = GenericScript<Vector3>.Make();
-            //this.Actor.AddScript(otherTest);
-
-            //var otherTest = GenericScript<Vector3>.Make<Vector3>();
-            //this.Actor.AddScript(otherTest);
         }
     }
 

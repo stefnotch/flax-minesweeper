@@ -19,16 +19,12 @@ namespace FlaxMinesweeper.Source.Tweening
         PingPong
     }
 
-    public class SimpleTweenLoopOptions
-    {
-        public int Repetitions = 1;
-    }
-
     public class SimpleTweenOptions
     {
         public LoopType LoopType = LoopType.Loop; // Used
         public bool IsLocal = true;
         public bool IsPhysics = false;
+        public bool IsAdditive = false;
         public bool Reversed = false; // Used
         public LerpType LerpType = LerpType.Lerp; // Used
         public AlphaBlendMode EasingType = AlphaBlendMode.Linear; // Used

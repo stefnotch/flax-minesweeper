@@ -18,6 +18,7 @@ namespace FlaxMinesweeper.Source.Tweening
         //private bool _hasFirstUpdate // TODO: If I need it
         private float _localTime;
         private float _rawPercentage;
+        private float _previousPercentage;
         private float _percentage;
 
         private bool _isPaused;
@@ -60,7 +61,7 @@ namespace FlaxMinesweeper.Source.Tweening
 
         public float StartTime { get => _startTime; set => _startTime = value; }
         public float Scale { get => _scale; set => _scale = value; }
-        public float Duration { get => _duration; set => _duration = value; }
+        public float Duration { get => _duration; protected set => _duration = value; } // The setter is protected, because of constant speed tweens and tween sequences
         public float ParentTime { get => _parentTime; protected set => _parentTime = value; }
         public float UnscaledLocalTime { get => _localTime / Scale; set => _localTime = value * Scale; }
         public float LocalTime { get => _localTime; protected set => _localTime = value; }
@@ -68,6 +69,7 @@ namespace FlaxMinesweeper.Source.Tweening
         /// <summary>
         /// From 0 to 1, both inclusive
         /// </summary>
+        public float PreviousPercentage { get => _previousPercentage; protected set => _previousPercentage = value; }
         public float Percentage { get => _percentage; protected set => _percentage = value; }
         public bool IsPaused { get => _isPaused; set { PausedChanged(value, _isPaused); _isPaused = value; } }
         public float PauseTime { get => _pauseTime; protected set => _pauseTime = value; }
@@ -88,12 +90,12 @@ namespace FlaxMinesweeper.Source.Tweening
         {
             if (IsPaused) return;
             if (parentTime < StartTime) return;
-            /* TODO: parentTime < StartTime: or set the Percentage to 0? Or set the Percentage to a negative value?;*/
 
             ParentTime = parentTime;
             LocalTime = (ParentTime - StartTime - PauseTime) * Scale;
             RawPercentage = LocalTime / Duration;
 
+            PreviousPercentage = Percentage;
             bool isDone = Done;
             if (isDone)
             {
@@ -105,8 +107,24 @@ namespace FlaxMinesweeper.Source.Tweening
             }
             else
             {
+                float percentage = RawPercentage % 1f;
+                if (Options.IsAdditive)
+                {
+                    /*
+                     * I'm at 0.25 and the next percentage is 0.5
+                     * However, the current position is a tweened one instead of the starting position
+                     * And thus, I want 0.3333 instead of 0.5
+                     * 
+                     * 0      0.25    0.5     0.75     1
+                     * |-------|-------|-------|-------|
+                     *         0      0.33    0.66     1
+                     * 
+                     */
+                    // The previous percentage should be an un-corrected percentage doe...
+                    //percentage = (percentage - PreviousPercentage) / (1 - PreviousPercentage);
+                }
                 // Interpolates and saturates the value
-                Percentage = Mathf.InterpolateAlphaBlend(RawPercentage % 1, Options.EasingType);
+                Percentage = Mathf.InterpolateAlphaBlend(percentage, Options.EasingType);
                 Percentage = IsReversedLoop ? 1 - Percentage : Percentage;
             }
 

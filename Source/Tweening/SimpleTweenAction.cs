@@ -23,6 +23,8 @@ namespace FlaxMinesweeper.Source.Tweening
             set => base.Sequence = value;
         }
 
+        public new float Duration { get => base.Duration; set => base.Duration = value; }
+
         /// <summary>
         /// Creates a new sibling-sequence
         /// </summary>
@@ -39,22 +41,27 @@ namespace FlaxMinesweeper.Source.Tweening
 
         public SimpleTweenAction<U, Vector3> MoveTo(Vector3 to, float duration, float? startDelay = null)
         {
-            return Sequence.MoveTo(to, duration, startDelay);
+            return Sequence.MoveTo(to, duration, startDelay ?? EndTime);
         }
 
         public SimpleTweenAction<U, Quaternion> RotateTo(Quaternion to, float duration, float? startDelay = null)
         {
-            return Sequence.RotateTo(to, duration, startDelay);
+            return Sequence.RotateTo(to, duration, startDelay ?? EndTime);
         }
 
         public SimpleTweenAction<U, Vector3> ScaleTo(Vector3 to, float duration, float? startDelay = null)
         {
-            return Sequence.ScaleTo(to, duration, startDelay);
+            return Sequence.ScaleTo(to, duration, startDelay ?? EndTime);
         }
 
         public SimpleTweenAction<U> Wait(float duration, Action<SimpleTweenAction<U, float>> callback = null)
         {
             return Sequence.Wait(duration, callback);
+        }
+
+        public SimpleTweenAction<U> Wait(float duration, float? startDelay, Action<SimpleTweenAction<U, float>> callback = null)
+        {
+            return Sequence.Wait(duration, startDelay ?? EndTime, callback);
         }
 
         #endregion Actions
@@ -126,23 +133,6 @@ OnWaypointChange(TweenCallback<int> callback)
 
         #region Modify Options
 
-        /// <summary>
-        /// Sets the scale
-        /// </summary>
-        /// <param name="repetitionCount"></param>
-        /// <returns></returns>
-        public SimpleTweenAction<U, T> SetRepetitions(int repetitionCount)
-        {
-            this.Scale = repetitionCount;
-            return this;
-        }
-
-        public SimpleTweenAction<U, T> SetLoopType(LoopType loopType)
-        {
-            this.Options.LoopType = loopType;
-            return this;
-        }
-
         public SimpleTweenAction<U, T> SetFrom(T from)
         {
             _fromValueSet = true;
@@ -157,21 +147,9 @@ OnWaypointChange(TweenCallback<int> callback)
             return this;
         }
 
-        public SimpleTweenAction<U, T> SetReversed(bool reversed = true)
+        public SimpleTweenAction<U, T> SetDuration(float duration)
         {
-            this.Options.Reversed = reversed;
-            return this;
-        }
-
-        public SimpleTweenAction<U, T> SetStartDelay(float startDelay)
-        {
-            this.StartTime = (Sequence?.LocalTime ?? ParentTime) + startDelay;
-            return this;
-        }
-
-        public SimpleTweenAction<U, T> SetStartTime(float startTime)
-        {
-            this.StartTime = startTime;
+            this.Duration = duration;
             return this;
         }
 

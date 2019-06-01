@@ -29,6 +29,8 @@ namespace FlaxMinesweeper.Source.Tweening
 
         }
 
+        public new float Duration => base.Duration * Scale;
+
         public bool DestroyOnFinish { get; set; } = true;
 
         public override void Cancel()
@@ -77,9 +79,9 @@ namespace FlaxMinesweeper.Source.Tweening
             // TODO: Optimize this
             _actions.Add(child);
             //_actions.Sort(); // TODO: Notify the parent (this) when the StartTime changes
-            if (child.EndTime > Duration)
+            if (child.EndTime > base.Duration)
             {
-                Duration = child.EndTime;
+                base.Duration = child.EndTime;
             }
         }
 
@@ -100,7 +102,7 @@ namespace FlaxMinesweeper.Source.Tweening
                 if (Scale > 1)
                 {
                     // Wrap around local time
-                    action.Update(LocalTime % Duration);
+                    action.Update(LocalTime % base.Duration);
                 }
                 else
                 {
@@ -114,7 +116,7 @@ namespace FlaxMinesweeper.Source.Tweening
                 }
             }
 
-            Duration = maxEndTime; // TODO: Or notify the parent whenever a Startime/(pause?)/Duration changes
+            base.Duration = maxEndTime; // TODO: Or notify the parent whenever a Startime/(pause?)/Duration changes
 
             if (Done && DestroyOnFinish)
             {
@@ -173,10 +175,18 @@ namespace FlaxMinesweeper.Source.Tweening
 
         public SimpleTweenAction<U> Wait(float duration, Action<SimpleTweenAction<U, float>> callback = null)
         {
-            var tweenAction = AddTweenAction(1f, duration, null, SimpleTweenFunctions.Nothing<U>, SimpleTweenFunctions.GetZero, SimpleTweenFunctions.GetOne);
+            return Wait(duration, null, callback);
+        }
+
+        public SimpleTweenAction<U> Wait(float duration, float? startDelay, Action<SimpleTweenAction<U, float>> callback = null)
+        {
+            // If we want the wait thingy to start at 0 or something.
+            var tweenAction = AddTweenAction(1f, duration, startDelay, SimpleTweenFunctions.Nothing<U>, SimpleTweenFunctions.GetZero, SimpleTweenFunctions.GetOne);
             if (callback != null) tweenAction.OnEnd(callback);
             return tweenAction;
         }
+
+        #endregion Actions
 
         private SimpleTweenAction<U, T> AddTweenAction<T>(T to, float duration, float? startDelay, Action<SimpleTweenAction<U, T>> tweenFunction, Func<U, T> defaultFromValue = null, Func<U, T> defaultToValue = null)
         {
@@ -203,54 +213,5 @@ namespace FlaxMinesweeper.Source.Tweening
             }
             return tweenAction;
         }
-
-        #endregion Actions
-
-        /* public SimpleTweenSequence<U> Add(SimpleTweenable simpleTweenable)
-         {
-         // TODO: What was this?
-             // Case where it's a sequence
-             // Case where it's just an action
-
-             // For both cases: Case where the actor doesn't have a sequence yet VS case where the actor already has a sequence
-             throw new NotImplementedException();
-         }*/
-
-
-        #region Modify Options
-        // Note: They aren't in SimpleTweenable so that I can specify the correct return type
-
-        public SimpleTweenSequence<U> SetRepetitions(int repetitionCount)
-        {
-            this.Scale = repetitionCount;
-            return this;
-        }
-
-        public SimpleTweenSequence<U> SetLoopType(LoopType loopType)
-        {
-            this.Options.LoopType = loopType;
-            return this;
-        }
-
-        public SimpleTweenSequence<U> SetReversed(bool reversed = true)
-        {
-            this.Options.Reversed = reversed;
-            return this;
-        }
-
-        public SimpleTweenSequence<U> SetStartDelay(float startDelay)
-        {
-            this.StartTime = (Sequence?.LocalTime ?? ParentTime) + startDelay;
-            return this;
-        }
-
-        public SimpleTweenSequence<U> SetStartTime(float startTime)
-        {
-            this.StartTime = startTime;
-            return this;
-        }
-
-        #endregion Modify Options
-
     }
 }

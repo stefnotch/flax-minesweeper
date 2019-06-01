@@ -32,7 +32,8 @@ namespace FlaxMinesweeper.Source.Tweening
 
         internal static void TranslateLocal<U>(SimpleTweenAction<U, Vector3> tweenAction) where U : Actor
         {
-            tweenAction.Target.LocalPosition = Vector3.Lerp(tweenAction.FromValue, tweenAction.ToValue, tweenAction.Percentage);
+            Vector3 current = tweenAction.Options.IsAdditive ? tweenAction.Target.LocalPosition : tweenAction.FromValue;
+            tweenAction.Target.LocalPosition = Vector3.Lerp(current, tweenAction.ToValue, tweenAction.Percentage);
         }
 
         internal static void RotateLocal<U>(SimpleTweenAction<U, Quaternion> tweenAction) where U : Actor

@@ -59,6 +59,7 @@
     <Compile Include="Source\TextTextureGenerator.cs" />
     <Compile Include="Source\Tweening\SimpleTween.cs" />
     <Compile Include="Source\Tweening\SimpleTweenable.cs" />
+    <Compile Include="Source\Tweening\SimpleTweenableExtensions.cs" />
     <Compile Include="Source\Tweening\SimpleTweenAction.cs" />
     <Compile Include="Source\Tweening\SimpleTweenFunctions.cs" />
     <Compile Include="Source\Tweening\SimpleTweenOptions.cs" />
