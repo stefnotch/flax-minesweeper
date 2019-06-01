@@ -108,21 +108,7 @@ namespace FlaxMinesweeper.Source.Tweening
             else
             {
                 float percentage = RawPercentage % 1f;
-                if (Options.IsAdditive)
-                {
-                    /*
-                     * I'm at 0.25 and the next percentage is 0.5
-                     * However, the current position is a tweened one instead of the starting position
-                     * And thus, I want 0.3333 instead of 0.5
-                     * 
-                     * 0      0.25    0.5     0.75     1
-                     * |-------|-------|-------|-------|
-                     *         0      0.33    0.66     1
-                     * 
-                     */
-                    // The previous percentage should be an un-corrected percentage doe...
-                    //percentage = (percentage - PreviousPercentage) / (1 - PreviousPercentage);
-                }
+
                 // Interpolates and saturates the value
                 Percentage = Mathf.InterpolateAlphaBlend(percentage, Options.EasingType);
                 Percentage = IsReversedLoop ? 1 - Percentage : Percentage;

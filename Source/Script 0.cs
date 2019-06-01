@@ -119,7 +119,6 @@ namespace FlaxMinesweeper
                 //	.MoveTo(this.Actor, new Vector3(0, -100, 0), 2)
                 //	.OnFinished((x2) => x2.Repeat());
             });
-            // TODO: We've reached this point vvv
             // 12
             Actions.Add("Multiple Moves and repeat", () =>
             {
@@ -130,6 +129,7 @@ namespace FlaxMinesweeper
                     .Sequence
                     .SetRepetitions(3); // TODO: This doesn't work...
             });
+            // TODO: We've reached this point vvv
             // 13
             Actions.Add("NOT IMPLEMENTED Create sequence and add to actor", () =>
             {

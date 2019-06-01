@@ -33,7 +33,26 @@ namespace FlaxMinesweeper.Source.Tweening
         internal static void TranslateLocal<U>(SimpleTweenAction<U, Vector3> tweenAction) where U : Actor
         {
             Vector3 current = tweenAction.Options.IsAdditive ? tweenAction.Target.LocalPosition : tweenAction.FromValue;
-            tweenAction.Target.LocalPosition = Vector3.Lerp(current, tweenAction.ToValue, tweenAction.Percentage);
+
+            float percentage = tweenAction.Percentage;
+            float previousPercentage = tweenAction.PreviousPercentage;
+            if (tweenAction.Options.IsAdditive && previousPercentage < 1 && percentage != previousPercentage)
+            {
+                /*
+                 * I'm at 0.25 and the next percentage is 0.5
+                 * However, the current position is a tweened one instead of the starting position
+                 * And thus, I want 0.3333 instead of 0.5
+                 * 
+                 * 0      0.25    0.5     0.75     1
+                 * |-------|-------|-------|-------|
+                 *         0      0.33    0.66     1
+                 * 
+                 */
+                // This will probably break down as soon as I use a non-linear easing type
+                percentage = (percentage - previousPercentage) / (1 - previousPercentage);
+            }
+
+            tweenAction.Target.LocalPosition = Vector3.Lerp(current, tweenAction.ToValue, percentage);
         }
 
         internal static void RotateLocal<U>(SimpleTweenAction<U, Quaternion> tweenAction) where U : Actor
