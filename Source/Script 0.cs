@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FlaxEngine;
-using FlaxMinesweeper.Source;
-using FlaxMinesweeper.Source.Tweening;
+using SimpleTweening;
 
 namespace FlaxMinesweeper
 {
@@ -11,7 +10,7 @@ namespace FlaxMinesweeper
         [NoSerialize]
         public Dictionary<string, Action> Actions = new Dictionary<string, Action>();
 
-        private void Start()
+        public override void OnStart()
         {
             // 0
             Actions.Add("Reset", () =>
@@ -127,23 +126,24 @@ namespace FlaxMinesweeper
                     .MoveTo(new Vector3(100, -100, 0), 2)
                     .MoveTo(new Vector3(100, 0, 0), 2)
                     .Sequence
-                    .SetRepetitions(3); // TODO: This doesn't work...
+                    .SetRepetitions(3);
             });
-            // TODO: We've reached this point vvv
             // 13
-            Actions.Add("NOT IMPLEMENTED Create sequence and add to actor", () =>
+            Actions.Add("Create sequence and add to actor", () =>
             {
                 var seq = SimpleTween
                     .CreateSequence<Actor>()
-                    .MoveTo(new Vector3(0, -100, 0), 2)
-                    .MoveTo(new Vector3(0, -100, 0), 2)
-                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .MoveTo(new Vector3(0, -100, 0), 1)
+                    .MoveTo(new Vector3(0, -100, 30), 1)
+                    .MoveTo(new Vector3(30, -100, 0), 1)
                     .Sequence
-                    .SetRepetitions(3);
+                    .SetRepetitions(2);
 
                 SimpleTween
                     .Add(seq, this.Actor);
             });
+
+            // TODO: We've reached this point vvv
             // 14
             Actions.Add("Single Animation Additive Mode", () =>
             {
@@ -153,22 +153,24 @@ namespace FlaxMinesweeper
                     .SetAdditive(true);
             });
             // 15
-            /*Actions.Add("Multile Animations with Additive Mode", () =>
+            Actions.Add("Multiple Animations including Additive Mode", () =>
             {
                 SimpleTween
                     .Tween(Actor)
-                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .MoveTo(new Vector3(0, -100, 0), 2, 0)
+                    .MoveTo(new Vector3(0, -100, 50), 2, 0)
                     .SetAdditive(true);
             });
             // 16
-            Actions.Add("Multile Animations including Additive Mode", () =>
+            Actions.Add("Multiple Animations with Additive Mode", () =>
             {
                 SimpleTween
                     .Tween(Actor)
-                    .MoveTo(new Vector3(0, -100, 0), 2)
+                    .MoveTo(new Vector3(0, -100, 0), 2, 0)
+                    .SetAdditive(true)
+                    .MoveTo(new Vector3(0, -100, 50), 2, 0)
                     .SetAdditive(true);
-            });*/
-
+            });
             /*Actor
                 .Tween()*/
             /*SimpleTween
@@ -185,24 +187,6 @@ namespace FlaxMinesweeper
                         .ScaleTo(Actor, new Vector3(2), 2);
                 });
                 */
-        }
-    }
-
-    internal class TestEnable : Script
-    {
-        private void OnEnable()
-        {
-            Debug.Log("enabled!");
-        }
-
-        private void Start()
-        {
-            Debug.Log("start");
-        }
-
-        private void OnDisable()
-        {
-            Debug.Log("disabled");
         }
     }
 }

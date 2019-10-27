@@ -152,6 +152,33 @@
 			"ID": "d3484eaf4508b4b4db6a6ea6957c6da4",
 			"ParentID": "c68ee45843a66ad4924b7a936f34c9be",
 			"V": {}
+		},
+		{
+			"TypeID": 13,
+			"ID": "450eee7a47ce58d7bd533ebed4d75ce4",
+			"ParentID": "74a68a984824b4510d12589f199ad68f",
+			"Name": "PostFxVolume",
+			"Settings": {
+				"AO": {},
+				"Bloom": {
+					"Enabled": true,
+					"Intensity": 1.0,
+					"Threshold": 3.0,
+					"BlurSigma": 3.5999999046325685,
+					"Scale": 1.7999999523162842,
+					"OverrideFlags": 0
+				},
+				"ToneMapping": {},
+				"ColorGrading": {},
+				"EyeAdaptation": {},
+				"CameraArtifacts": {},
+				"LensFlares": {},
+				"DepthOfField": {},
+				"MotionBlur": {},
+				"SSR": {},
+				"AA": {},
+				"PostFxMaterials": []
+			}
 		}
 	]
 }
