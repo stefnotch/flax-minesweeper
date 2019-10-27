@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FlaxEngine;
 
-namespace FlaxMinesweeper.Source.Tweening
+namespace SimpleTweening
 {
     public enum LerpType
     {

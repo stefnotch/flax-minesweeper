@@ -5,15 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using FlaxEngine;
 
-namespace FlaxMinesweeper.Source.Tweening
+namespace SimpleTweening
 {
     public static class SimpleTweenableExtensions
     {
         // Options setters as extension methods so that they can return the correct type
 
-        public static T SetRepetitions<T>(this T tweenAble, int repetitionCount) where T : SimpleTweenable
+        public static T SetRepetitions<T>(this T tweenAble, float repetitionCount) where T : SimpleTweenable
         {
-            tweenAble.Scale = repetitionCount;
+            tweenAble.Duration *= repetitionCount;
             return tweenAble;
         }
 
@@ -49,7 +49,9 @@ namespace FlaxMinesweeper.Source.Tweening
 
         public static T SetStartDelay<T>(this T tweenAble, float startDelay) where T : SimpleTweenable
         {
-            tweenAble.StartTime = (tweenAble.Sequence?.LocalTime ?? tweenAble.ParentTime) + startDelay;
+            float startTime = (tweenAble.Sequence != null) ? tweenAble.Sequence.LocalTime : Time.GameTime;
+
+            tweenAble.StartTime = startTime + startDelay;
             return tweenAble;
         }
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -22,7 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>DEBUG;FLAX_ASSERTIONS;TRACE;FLAX_0;FLAX_0_4;FLAX_0_4_6181;FLAX_EDITOR;FLAX_WINDOWS;FLAX_EDITOR_WIN</DefineConstants>
+    <DefineConstants>DEBUG;FLAX_ASSERTIONS;TRACE;FLAX_0;FLAX_0_5;FLAX_0_5_6187;FLAX_EDITOR;FLAX_WINDOWS;FLAX_EDITOR_WIN</DefineConstants>
 	<UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -33,7 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>TRACE;FLAX_0;FLAX_0_4;FLAX_0_4_6181;FLAX_EDITOR;FLAX_WINDOWS;FLAX_EDITOR_WIN</DefineConstants>
+    <DefineConstants>TRACE;FLAX_0;FLAX_0_5;FLAX_0_5_6187;FLAX_EDITOR;FLAX_WINDOWS;FLAX_EDITOR_WIN</DefineConstants>
 	<UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
@@ -42,27 +42,25 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
 	<Reference Include="FlaxEngine">
-		<HintPath>Cache\Assemblies\Release\FlaxEngine.dll</HintPath>
+		<HintPath>Cache\Assemblies\FlaxEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="Newtonsoft.Json">
-		<HintPath>Cache\Assemblies\Release\Newtonsoft.Json.dll</HintPath>
+		<HintPath>Cache\Assemblies\Newtonsoft.Json.dll</HintPath>
 	</Reference>
 	<Reference Include="FlaxEditor">
-		<HintPath>Cache\Assemblies\Release\FlaxEditor.dll</HintPath>
+		<HintPath>Cache\Assemblies\FlaxEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Script 0.cs" />
     <Compile Include="Source\SimpleTweening\SimpleTween.cs" />
     <Compile Include="Source\SimpleTweening\SimpleTweenable.cs" />
-    <Compile Include="Source\Tweening\SimpleTween.cs" />
-    <Compile Include="Source\Tweening\SimpleTweenable.cs" />
-    <Compile Include="Source\Tweening\SimpleTweenableExtensions.cs" />
-    <Compile Include="Source\Tweening\SimpleTweenAction.cs" />
-    <Compile Include="Source\Tweening\SimpleTweenFunctions.cs" />
-    <Compile Include="Source\Tweening\SimpleTweenOptions.cs" />
-    <Compile Include="Source\Tweening\SimpleTweenSequence.cs" />
-    <Compile Include="Source\Tweening\TweenAction.cs" />
+    <Compile Include="Source\SimpleTweening\SimpleTweenableExtensions.cs" />
+    <Compile Include="Source\SimpleTweening\SimpleTweenAction.cs" />
+    <Compile Include="Source\SimpleTweening\SimpleTweenFunctions.cs" />
+    <Compile Include="Source\SimpleTweening\SimpleTweenOptions.cs" />
+    <Compile Include="Source\SimpleTweening\SimpleTweenSequence.cs" />
+    <Compile Include="Source\SimpleTweening\TweenAction.cs" />
     <Compile Include="Cache\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

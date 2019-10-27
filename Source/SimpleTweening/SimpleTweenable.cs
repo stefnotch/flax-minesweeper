@@ -5,23 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using FlaxEngine;
 
-namespace FlaxMinesweeper.Source.Tweening
+namespace SimpleTweening
 {
     public abstract class SimpleTweenable : IComparable<SimpleTweenable>
     {
         private float _startTime;
-        private float _scale = 1f;
-        private float _duration;
-        private float _parentTime;
-        private float _pauseTime;
-        //private float _unscaledLocalTime; // Computed on the fly
-        //private bool _hasFirstUpdate // TODO: If I need it
         private float _localTime;
+        private float _duration;
+        private bool _isPaused;
+        private float _pauseDuration;
+
         private float _rawPercentage;
         private float _previousPercentage;
         private float _percentage;
 
-        private bool _isPaused;
         private float _currentPauseStartTime;
         private SimpleTweenSequence _parent;
 
@@ -47,40 +44,64 @@ namespace FlaxMinesweeper.Source.Tweening
         public SimpleTweenable(SimpleTweenSequence parent = null)
         {
             Sequence = parent;
-            if (parent == null)
-            {
-                // e.g. parent == Script
-                this.StartTime = Time.GameTime;
-            }
-            else
-            {
-                // parent == sequence
-                this.StartTime = parent.LocalTime;
-            }
+
+            // When the parent exists, use its time
+            // Otherwise, this tween is attached to a script. Then, we can use the game time
+            StartTime = (parent != null) ? parent.LocalTime : Time.GameTime;
         }
 
-        public float StartTime { get => _startTime; set { _startTime = value; Sequence?.ChildEndTimeChanged(this); } }
-        public float Scale { get => _scale; set => _scale = value; }
-        public float Duration { get => _duration; protected set { _duration = value; Sequence?.ChildEndTimeChanged(this); } } // The setter is protected, because of constant speed tweens and tween sequences
-        public float ParentTime { get => _parentTime; protected set => _parentTime = value; }
-        public float UnscaledLocalTime { get => _localTime / Scale; set => _localTime = value * Scale; }
-        public float LocalTime { get => _localTime; protected set => _localTime = value; }
-        public float RawPercentage { get => _rawPercentage; protected set => _rawPercentage = value; }
         /// <summary>
-        /// From 0 to 1, both inclusive
+        /// The sequence this tween belongs to
+        /// </summary>
+        public SimpleTweenSequence Sequence { get => _parent; set { ParentChanged(value, _parent); _parent = value; } }
+
+        /// <summary>
+        /// On the parent's timeline
+        /// </summary>
+        public float StartTime { get => _startTime; set { _startTime = value; } }
+
+        /// <summary>
+        /// Time offset
+        /// </summary>
+        public float LocalTime { get => _localTime; protected set => _localTime = value; }
+
+        /// <summary>
+        /// Global Time
+        /// </summary>
+        public float Duration { get => _duration; set { _duration = value; } }
+
+        /// <summary>
+        /// If this tween is paused
+        /// </summary>
+        public bool IsPaused { get => _isPaused; set { PausedChanged(value, _isPaused); _isPaused = value; } }
+
+        /// <summary>
+        /// How long has this tween been paused for
+        /// </summary>
+        public float PauseDuration { get => _pauseDuration; protected set { _pauseDuration = value; } }
+
+        /// <summary>
+        /// The percentage before applying the tween function
+        /// </summary>
+        public float RawPercentage { get => _rawPercentage; protected set => _rawPercentage = value; }
+
+        /// <summary>
+        /// The previous percentage
         /// </summary>
         public float PreviousPercentage { get => _previousPercentage; protected set => _previousPercentage = value; }
-        public float Percentage { get => _percentage; protected set => _percentage = value; }
-        public bool IsPaused { get => _isPaused; set { PausedChanged(value, _isPaused); _isPaused = value; } }
-        public float PauseTime { get => _pauseTime; protected set { _pauseTime = value; Sequence?.ChildEndTimeChanged(this); } } // TODO: Optimize this
 
+        /// <summary>
+        /// Percentage from 0 to 1, both inclusive
+        /// </summary>
+        public float Percentage { get => _percentage; protected set => _percentage = value; }
+
+        /// <summary>
+        /// Tweening options
+        /// </summary>
         public SimpleTweenOptions Options { get; set; } = new SimpleTweenOptions();
 
-
-        public float EndTime => StartTime + PauseTime + Duration; // TODO: Notify the parent whenever the duration changes
+        public float EndTime => StartTime + PauseDuration + Duration;
         public bool IsReversedLoop => Options.Reversed ^ (Options.LoopType == LoopType.PingPong && RawPercentage % 2 > 1);
-        public bool Done => ParentTime >= EndTime;
-        public SimpleTweenSequence Sequence { get => _parent; set { ParentChanged(value, _parent); _parent = value; } }
 
         /// <summary>
         /// Updates the tween
@@ -91,20 +112,21 @@ namespace FlaxMinesweeper.Source.Tweening
             if (IsPaused) return;
             if (parentTime < StartTime) return;
 
-            ParentTime = parentTime;
-            LocalTime = (ParentTime - StartTime - PauseTime) * Scale;
+            LocalTime = parentTime - StartTime - PauseDuration;
             RawPercentage = LocalTime / Duration;
 
             PreviousPercentage = Percentage;
-            bool isDone = Done;
+
+            // TODO: Are you sure?
+            bool isDone = EndTime < parentTime;
             if (isDone)
             {
                 Percentage = IsReversedLoop ? 0 : 1;
             }
-            else if (RawPercentage % 1 == 0)
+            /*else if (RawPercentage % 1 == 0)
             {
                 Percentage = 0;
-            }
+            }*/
             else
             {
                 float percentage = RawPercentage % 1f;
@@ -113,6 +135,7 @@ namespace FlaxMinesweeper.Source.Tweening
                 Percentage = Mathf.InterpolateAlphaBlend(percentage, Options.EasingType);
                 Percentage = IsReversedLoop ? 1 - Percentage : Percentage;
             }
+            // End of // TODO: Are you sure?
 
             OnUpdate();
 
@@ -130,63 +153,28 @@ namespace FlaxMinesweeper.Source.Tweening
         /// </summary>
         public virtual void Finish()
         {
-            // TODO: What if the animation hasn't started yet (if (parentTime < StartTime) return;)
-
-            // TODO: Should I mess around with the StartTime or the Duration?
-
-            // TODO: Notify parent that this animation has been finished?
-
-            // TODO: Or should I wait until the next Update() call?
-
-            // I'm just going to force a finish update and then cancel the animation
+            // I'm just going to do a finish update and let the update function handle this
             Update(EndTime);
-            Cancel();
         }
 
         public virtual void Cancel()
         {
-            // Notify parent that this animation has been cancelled
-            Sequence?.ChildRemoved(this);
-        }
-
-        protected virtual void ChildAdded(SimpleTweenable child)
-        {
-
-        }
-
-        protected virtual void ChildRemoved(SimpleTweenable child)
-        {
-
-        }
-
-        protected virtual void ChildEndTimeChanged(SimpleTweenable child)
-        {
-
+            throw new NotImplementedException();
         }
 
         private void PausedChanged(bool isPausedNew, bool isPausedOld)
         {
             if (isPausedNew != isPausedOld)
             {
-                // Paused state has changed
                 if (isPausedNew)
                 {
-                    _currentPauseStartTime = ParentTime;
+                    // TODO: Is this the best approach? Or should I use LocalTime? Or the parent time?
+                    _currentPauseStartTime = Time.GameTime;
                 }
                 else
                 {
-                    PauseTime += ParentTime - _currentPauseStartTime;
+                    PauseDuration += Time.GameTime - _currentPauseStartTime;
                 }
-            }
-        }
-
-        protected void ParentChanged(SimpleTweenSequence newParent, SimpleTweenSequence oldParent)
-        {
-            if (newParent != oldParent)
-            {
-                ParentTime = newParent?.LocalTime ?? Time.GameTime;
-                oldParent?.ChildRemoved(this);
-                newParent?.ChildAdded(this);
             }
         }
 
@@ -195,6 +183,19 @@ namespace FlaxMinesweeper.Source.Tweening
         protected virtual void OnDone()
         {
             EndEvent?.Invoke(this);
+        }
+
+        protected virtual void OnChildRemoved(SimpleTweenable child) { }
+
+        protected virtual void OnChildAdded(SimpleTweenable child) { }
+
+        protected void ParentChanged(SimpleTweenSequence newParent, SimpleTweenSequence oldParent)
+        {
+            if (newParent != oldParent)
+            {
+                oldParent?.OnChildRemoved(this);
+                newParent?.OnChildAdded(this);
+            }
         }
 
         public int CompareTo(SimpleTweenable other)

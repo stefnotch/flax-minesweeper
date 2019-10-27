@@ -5,12 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using FlaxEngine;
 
-namespace FlaxMinesweeper.Source.Tweening
+namespace SimpleTweening
 {
     public abstract class SimpleTweenAction<U> : SimpleTweenable where U : Actor
     {
-        protected SimpleTweenOptions _options = new SimpleTweenOptions();
-
         public SimpleTweenAction(SimpleTweenSequence parent = null) : base(parent)
         {
         }
@@ -22,8 +20,6 @@ namespace FlaxMinesweeper.Source.Tweening
             get => (SimpleTweenSequence<U>)base.Sequence;
             set => base.Sequence = value;
         }
-
-        public new float Duration { get => base.Duration; set => base.Duration = value; }
 
         /// <summary>
         /// Creates a new sibling-sequence

@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FlaxEngine;
-using FlaxMinesweeper.Source.Tweening;
 
-namespace FlaxMinesweeper.Source.Tweening
+namespace SimpleTweening
 {
     public static class SimpleTween
     {
@@ -45,13 +44,13 @@ namespace FlaxMinesweeper.Source.Tweening
         public static SimpleTweenSequence<U> CreateSequence<U>() where U : Actor
         {
             return new SimpleTweenSequence<U>(null);
-            throw new NotImplementedException("I'm attempting to pass null to the SimpleTweenSequence..");
         }
 
         public static SimpleTweenSequence<U> Add<U>(SimpleTweenable simpleTweenable, U actor) where U : Actor
         {
             // TODO: Optimize the case where the actor doesn't have a SimpleTweenScript??
             var seq = GetSequence(actor);
+            // TODO: Should we really return the root sequence? Or should we .NewSequence()?
             seq.Add(simpleTweenable);
             return seq;
         }
@@ -79,11 +78,11 @@ public static SimpleTweenSequence<U> Wait<U>()
 
         public SimpleTweenSequence TweenSequence => _tweenSequence;
 
-        private void OnEnable()
+        public override void OnEnable()
         {
         }
 
-        private void Update()
+        public override void OnUpdate()
         {
             _tweenSequence.Update(Time.GameTime);
             /*if(_tweenSequence.IsFinished)
@@ -91,9 +90,10 @@ public static SimpleTweenSequence<U> Wait<U>()
             }*/
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
             _tweenSequence.Cancel();
+            _tweenSequence = null;
             //this.Actor.RemoveScript(this);
             //FlaxEngine.Object.Destroy(this);
         }

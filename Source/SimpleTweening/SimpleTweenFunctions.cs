@@ -1,7 +1,7 @@
 ﻿using System;
 using FlaxEngine;
 
-namespace FlaxMinesweeper.Source.Tweening
+namespace SimpleTweening
 {
     internal static class SimpleTweenFunctions
     {

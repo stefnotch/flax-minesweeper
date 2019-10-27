@@ -30,37 +30,29 @@ A smol Minesweeper game using the amazing [FlaxEngine](http://flaxengine.com/).
 - delta/additive tweens: tween from A(0,0,0) to B (0,10,0) and moving(linearvelocity/tweening) from A(0,0,0) to C(0,0,10) ==> end: D (0,10,10)
   ==> animating moving objects
 - tween set percentage
-
 - optimized tween stuff that can get called every Update()
   ==> animating a gun turrent (move it to the mouse every Update())
-
 - constant speed animations (as opposed to constant time)
   ==> paths
-
 - staggered effects
   ==> different objects, same effect (with a delay)
       repeat(100) + stagger(10) // milliseconds/seconds, whatever Flax uses
 - randomized start times
   ==> tween 100 blocks into the start position
   ==> (combined with staggering)
-
 - tweening towards a moving target
   ==> Tweening to the mouse
-
 - tween from float 1 to float 7
   ==> progress bar (custom onUpdate)
-
 - tween forever
   ==> all animations that should play forever
-
 - tween the width
   ==> object gets thinner when you move it quickly
-
 - tween binding
   ==> speed --> bound to width
   ==> quite possible, since it's not really binding, it just grabs the current speed every Update()
-
 - https://www.youtube.com/watch?v=Fy0aCDmgnxg
+- Use `Time.GameTimeTicks` (which is a long) to avoid float precision issues
 
 
 
