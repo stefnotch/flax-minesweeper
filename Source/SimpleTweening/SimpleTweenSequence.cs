@@ -10,90 +10,177 @@ namespace SimpleTweening
     /// <summary>
     /// A sequence of tweens
     /// </summary>
-    public abstract class SimpleTweenSequence : SimpleTweenable
+    public class SimpleTweenSequence : SimpleTweenSequenceElement
     {
-        // TODO: If DestroyOnFinish = true, switch to a wrap-around list, where old actions get overwritten
-        protected int Index = 0;
-        protected readonly List<SimpleTweenable> _actions = new List<SimpleTweenable>(); // Or an interval tree?
+        private float _localTime;
+        private bool _isPaused;
+        private float _pauseDuration;
+        private float _currentPauseStartTime;
 
-        protected SimpleTweenSequence(SimpleTweenSequence parent = null) : base(parent)
+        // Or an interval tree?
+        protected readonly List<SimpleTweenSequenceElement> _actions = new List<SimpleTweenSequenceElement>();
+        //protected readonly List<SimpleTweenSequence> _actions = new List<SimpleTweenSequence>();
+        //protected readonly List<SimpleTweener> _tweens = new List<SimpleTweener>();
+        //protected readonly List<SimpleTweenSequence> _sequences = new List<SimpleTweenSequence>();
+
+        protected event Action<SimpleTweenSequence> EndEvent;
+
+        public SimpleTweenSequence(SimpleTweenSequence sequence = null) : base(sequence)
         {
-            EndEvent += (_) =>
-            {
-                if (DestroyOnFinish)
-                {
-                    _actions.Clear();
-                }
-            };
         }
 
+        /// <summary>
+        /// Time offset
+        /// </summary>
+        public float LocalTime { get => _localTime; protected set => _localTime = value; }
+
+        /// <summary>
+        /// Global Time
+        /// </summary>
+        public override float FullDuration => StartTime - EndTime;
+
+        /// <summary>
+        /// On the parent's timeline
+        /// </summary>
+        public float EndTime => _actions.Max(action => action.StartTime + action.FullDuration);
+
+        /// <summary>
+        /// If this tween is paused
+        /// </summary>
+        public bool IsPaused { get => _isPaused; set { PausedChanged(value, _isPaused); _isPaused = value; } }
+
+        /// <summary>
+        /// How long has this tween been paused for
+        /// </summary>
+        public float PauseDuration { get => _pauseDuration; protected set { _pauseDuration = value; } }
+
+        /// <summary>
+        /// Remove the tweens as soon as they are finished
+        /// </summary>
         public bool DestroyOnFinish { get; set; } = true;
 
-        public override void Cancel()
+        public override void Update(float parentTime)
         {
-            // Cancel the children
-            for (int i = _actions.Count - 1; i >= 0; i--)
-            {
-                _actions[i].Cancel();
-            }
+            if (IsPaused) return;
+            if (parentTime < StartTime) return;
 
-            if (DestroyOnFinish)
-            {
-                _actions.Clear();
-                // No need to clear the event, https://stackoverflow.com/a/17400033/3492994
-            }
+            LocalTime = parentTime - StartTime - PauseDuration;
 
-            // Cancel self
-            base.Cancel();
-        }
+            bool isDone = EndTime < parentTime;
 
-        public override void Finish()
-        {
-            // Finish the children
+            // Send the update event to all children
+            // TODO: Optimisation: only the ones that are currently active
             foreach (var action in _actions)
             {
-                action.Finish();
+                // Every tween should be updated at least once so that it's in the end state
+                action.Update(LocalTime);
+                // TODO: Remove completed children if DestroyOnFinish = true
             }
+
+            if (isDone)
+            {
+                OnDone();
+            }
+        }
+
+        public SimpleTweenSequence Finish()
+        {
+            // Finish self
+            // I'm just going to do a finish update and let the update function handle this
+            Update(EndTime);
+            return this;
+        }
+
+        public SimpleTweenSequence Cancel()
+        {
+            // Just remove ourselves from the sequence
+            Sequence = null;
+            return this;
+        }
+
+        protected void OnDone()
+        {
+            EndEvent?.Invoke(this);
 
             if (DestroyOnFinish)
             {
+                for (int i = _actions.Count - 1; i >= 0; i--)
+                {
+                    _actions[i].Sequence = null;
+                }
                 _actions.Clear();
             }
-
-            // Finish self
-            base.Finish();
         }
 
-        protected override void OnChildRemoved(SimpleTweenable child)
+        protected override void OnChildRemoved(SimpleTweenSequenceElement child)
         {
             // TODO: Optimize this
             _actions.Remove(child);
         }
 
-        protected override void OnChildAdded(SimpleTweenable child)
+        protected override void OnChildAdded(SimpleTweenSequenceElement child)
         {
             // TODO: Optimize this
             _actions.Add(child);
             //_actions.Sort(); 
         }
 
-        public T Add<T>(T simpleTweenable) where T : SimpleTweenable
+        private void PausedChanged(bool isPausedNew, bool isPausedOld)
+        {
+            if (isPausedNew != isPausedOld)
+            {
+                if (isPausedNew)
+                {
+                    // TODO: Is this the best approach? Or should I use LocalTime? Or the parent time?
+                    _currentPauseStartTime = Time.GameTime;
+                }
+                else
+                {
+                    PauseDuration += Time.GameTime - _currentPauseStartTime;
+                }
+            }
+        }
+
+        public T Add<T>(T simpleTweenable) where T : SimpleTweenSequenceElement
         {
             simpleTweenable.Sequence = this;
             return simpleTweenable;
         }
 
-        protected override void OnUpdate()
+        /// <summary>
+        /// Creates a new child-sequence
+        /// </summary>
+        /// <returns>The new sequence</returns>
+        public SimpleTweenSequence NewSequence()
         {
-            // Send the update event to all children
-            // TODO: Optimisation: only the ones that are currently active
-            foreach (var action in _actions)
-            {
-                action.Update(LocalTime);
-            }
-
-            // Every animation deserves to be played once (so that it's in the end state)
+            return new SimpleTweenSequence(this);
         }
+
+        /*public SimpleTweenAction<T> AddTweenAction<T>(T to, float duration, float? startDelay, Func<SimpleTweenAction<T>, T> tweenFunction, Action<T> setter, Func<T> getter, Func<T> defaultFromValue = null, Func<T> defaultToValue = null)
+        {
+            float? previousEndTime = _actions.DefaultIfEmpty(null).LastOrDefault()?.EndTime;
+
+            // Since we pass the parent, it automatically gets added to our _actions
+            var tweenAction = new SimpleTweenAction<T>(this, tweenFunction, defaultFromValue, defaultToValue);
+
+            tweenAction.SetTo(to);
+            tweenAction.Duration = duration;
+            if (startDelay.HasValue)
+            {
+                tweenAction.SetStartDelay(startDelay.Value);
+            }
+            else
+            {
+                // Take the previous tween's end time or take the current time
+                // TODO: This is wrong at the beginning (when LocalTime hasn't been initialized yet)
+
+                if (previousEndTime.HasValue)
+                {
+                    tweenAction.SetStartTime(previousEndTime.Value);
+                }
+            }
+            return tweenAction;
+        }*/
     }
 
     /// <summary>
@@ -102,27 +189,6 @@ namespace SimpleTweening
     /// <typeparam name="U">The affected actor</typeparam>
     public class SimpleTweenSequence<U> : SimpleTweenSequence where U : Actor
     {
-        // TODO: Target Actor?
-        // TODO: Get this from the parent as well?
-        protected U _target;
-
-        public SimpleTweenSequence(U target, SimpleTweenSequence parent = null) : base(parent)
-        {
-            _target = target;
-        }
-
-        public U Target { get => _target; protected set => _target = value; }
-
-        /// <summary>
-        /// Creates a new child-sequence
-        /// </summary>
-        /// <returns>The new sequence</returns>
-        public SimpleTweenSequence<U> NewSequence()
-        {
-            return new SimpleTweenSequence<U>(Target, this);
-            // TODO: This HAS to be behave identical to
-            //return Add(new SimpleTweenSequence<U>(Target, null));
-        }
 
         #region Actions
 
@@ -180,19 +246,6 @@ namespace SimpleTweening
                 }
             }
             return tweenAction;
-        }
-
-        /// <summary>
-        /// If a child that is a sequence gets added, update the target <see cref="Actor"/>
-        /// </summary>
-        /// <param name="child">The added child</param>
-        protected override void OnChildAdded(SimpleTweenable child)
-        {
-            base.OnChildAdded(child);
-            if (child is SimpleTweenSequence<U> sequence)
-            {
-                sequence.Target = Target;
-            }
         }
     }
 }

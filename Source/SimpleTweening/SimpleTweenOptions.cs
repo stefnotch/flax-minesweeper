@@ -21,12 +21,14 @@ namespace SimpleTweening
 
     public class SimpleTweenOptions
     {
-        public LoopType LoopType = LoopType.Loop; // Used
+        public LoopType LoopType = LoopType.Loop; // Done
+        public bool Reversed = false;
+        public int LoopCount = 1; // Done
+
         public bool IsLocal = true;
         public bool IsPhysics = false;
         public bool IsAdditive = false;
-        public bool Reversed = false; // Used
-        public LerpType LerpType = LerpType.Lerp; // Used
-        public AlphaBlendMode EasingType = AlphaBlendMode.Linear; // Used
+        public LerpType LerpType = LerpType.Lerp;
+        public AlphaBlendMode EasingType = AlphaBlendMode.Linear; // Done
     }
 }

@@ -46,7 +46,7 @@ namespace SimpleTweening
             return new SimpleTweenSequence<U>(null);
         }
 
-        public static SimpleTweenSequence<U> Add<U>(SimpleTweenable simpleTweenable, U actor) where U : Actor
+        public static SimpleTweenSequence<U> Add<U>(SimpleTweener simpleTweenable, U actor) where U : Actor
         {
             // TODO: Optimize the case where the actor doesn't have a SimpleTweenScript??
             var seq = GetSequence(actor);

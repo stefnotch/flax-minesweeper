@@ -1,10 +1,10 @@
 {
 	"ID": "74a68a984824b4510d12589f199ad68f",
 	"TypeName": "FlaxEngine.SceneAsset",
-	"EngineBuild": 6181,
+	"EngineBuild": 6187,
 	"Data": [
 		{
-			"TypeID": 9,
+			"TypeName": "FlaxEngine.Scene",
 			"ID": "74a68a984824b4510d12589f199ad68f",
 			"ParentID": "00000000000000000000000000000000",
 			"Name": "Scene",
@@ -18,13 +18,13 @@
 			"LightmapSettings": {}
 		},
 		{
-			"TypeID": 3,
+			"TypeName": "FlaxEngine.EmptyActor",
 			"ID": "28553d634087c67c711ebd96080482aa",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
 			"Name": "Visuals"
 		},
 		{
-			"TypeID": 10,
+			"TypeName": "FlaxEngine.Sky",
 			"ID": "bc81376747666609b0974580a21519a1",
 			"ParentID": "28553d634087c67c711ebd96080482aa",
 			"Name": "Sky",
@@ -41,7 +41,7 @@
 			"FogSunPower": 9.0
 		},
 		{
-			"TypeID": 7,
+			"TypeName": "FlaxEngine.EnvironmentProbe",
 			"ID": "da5e1c454a56377517d41686ebb0348f",
 			"ParentID": "28553d634087c67c711ebd96080482aa",
 			"Name": "Environment Probe",
@@ -56,7 +56,7 @@
 			"ProbeID": "1e1fb3a7447c1265b15967b480549d98"
 		},
 		{
-			"TypeID": 4,
+			"TypeName": "FlaxEngine.DirectionalLight",
 			"ID": "deecf0894777293a4f478dadacf2a6f8",
 			"ParentID": "28553d634087c67c711ebd96080482aa",
 			"Name": "Directional Light",
@@ -84,7 +84,7 @@
 			"ShadowsFadeDistance": 50.0
 		},
 		{
-			"TypeID": 25,
+			"TypeName": "FlaxEngine.SkyLight",
 			"ID": "eb18e84d41670d6314174b89a1d5ffea",
 			"ParentID": "28553d634087c67c711ebd96080482aa",
 			"Name": "SkyLight",
@@ -99,7 +99,7 @@
 			"CustomTexture": "1e1fb3a7447c1265b15967b480549d98"
 		},
 		{
-			"TypeID": 2,
+			"TypeName": "FlaxEngine.Camera",
 			"ID": "b0d72c3746caebca055e1f921ca21c7c",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
 			"Name": "Camera",
@@ -116,26 +116,10 @@
 					"W": 0.2537761330604553
 				}
 			},
-			"StaticFlags": 0,
-			"Near": 0.10000000149011612
+			"StaticFlags": 0
 		},
 		{
-			"TypeID": "NinaBirthday.CakeCamera",
-			"ID": "35c1387f4506b9f0a9f674b2a62e9cab",
-			"ParentID": "b0d72c3746caebca055e1f921ca21c7c",
-			"V": {
-	"Min": -88.0,
-	"Max": 88.0,
-	"Speed": {
-		"X": 6.0,
-		"Y": 6.0
-	},
-	"Damping": 0.01,
-	"Camera": "b0d72c3746caebca055e1f921ca21c7c"
-}
-		},
-		{
-			"TypeID": 1,
+			"TypeName": "FlaxEngine.StaticModel",
 			"ID": "c68ee45843a66ad4924b7a936f34c9be",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
 			"Name": "Cube",
@@ -148,13 +132,13 @@
 			}
 		},
 		{
-			"TypeID": "FlaxMinesweeper.Script0",
+			"TypeName": "FlaxMinesweeper.Script0",
 			"ID": "d3484eaf4508b4b4db6a6ea6957c6da4",
 			"ParentID": "c68ee45843a66ad4924b7a936f34c9be",
 			"V": {}
 		},
 		{
-			"TypeID": 13,
+			"TypeName": "FlaxEngine.PostFxVolume",
 			"ID": "450eee7a47ce58d7bd533ebed4d75ce4",
 			"ParentID": "74a68a984824b4510d12589f199ad68f",
 			"Name": "PostFxVolume",
@@ -176,8 +160,7 @@
 				"DepthOfField": {},
 				"MotionBlur": {},
 				"SSR": {},
-				"AA": {},
-				"PostFxMaterials": []
+				"AA": {}
 			}
 		}
 	]

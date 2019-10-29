@@ -7,7 +7,7 @@ using FlaxEngine;
 
 namespace SimpleTweening
 {
-    public abstract class SimpleTweenAction<U> : SimpleTweenable where U : Actor
+    public abstract class SimpleTweenAction<U> : SimpleTweener where U : Actor
     {
         public SimpleTweenAction(SimpleTweenSequence parent = null) : base(parent)
         {
@@ -85,8 +85,8 @@ namespace SimpleTweening
         private T _fromValue;
         private T _toValue;
         private Action<SimpleTweenAction<U, T>> _tweenFunction;
-        private readonly Func<U, T> _defaultFromValue;
-        private readonly Func<U, T> _defaultToValue;
+        private readonly Func<U, T> _defaultFromValue; // Required for: In 10 seconds, tween from *your current location* to XYZ
+        private readonly Func<U, T> _defaultToValue; // I dunno?
 
         public SimpleTweenAction(SimpleTweenSequence<U> sequence, Action<SimpleTweenAction<U, T>> tweenFunction, Func<U, T> defaultFromValue = null, Func<U, T> defaultToValue = null) : base(sequence)
         {
@@ -98,7 +98,6 @@ namespace SimpleTweening
         public T FromValue => _fromValue;
         public T ToValue => _toValue;
 
-        public U Target => Sequence.Target;
         // SetPaused
 
         // TODO: Update
