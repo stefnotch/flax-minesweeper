@@ -41,9 +41,9 @@ namespace SimpleTweening
             return Tween(actor).ScaleTo(to, duration);
         }
 
-        public static SimpleTweenSequence<U> CreateSequence<U>() where U : Actor
+        public static SimpleTweenSequence CreateSequence()
         {
-            return new SimpleTweenSequence<U>(null);
+            return new SimpleTweenSequence(null);
         }
 
         public static SimpleTweenSequence<U> Add<U>(SimpleTweener simpleTweenable, U actor) where U : Actor
@@ -66,17 +66,9 @@ public static SimpleTweenSequence<U> Wait<U>()
 
     public class SimpleTweenScript : Script
     {
-        private SimpleTweenSequence _tweenSequence;
-        private int _deadCounter = 0; // TODO: Use this as a timeout for removing this script
+        private int _removalTimeout = 0; // TODO: Use this as a timeout for removing this script
 
-        public SimpleTweenSequence<U> Init<U>() where U : Actor
-        {
-            var sequence = new SimpleTweenSequence<U>(this.Actor as U);
-            _tweenSequence = sequence;
-            return sequence;
-        }
-
-        public SimpleTweenSequence TweenSequence => _tweenSequence;
+        public SimpleTweenSequence TweenSequence { get; } = new SimpleTweenSequence(null);
 
         public override void OnEnable()
         {
@@ -84,7 +76,7 @@ public static SimpleTweenSequence<U> Wait<U>()
 
         public override void OnUpdate()
         {
-            _tweenSequence.Update(Time.GameTime);
+            TweenSequence.Update(Time.GameTime);
             /*if(_tweenSequence.IsFinished)
             {
             }*/

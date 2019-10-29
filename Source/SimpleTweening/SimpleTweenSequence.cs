@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,11 +19,6 @@ namespace SimpleTweening
 
         // Or an interval tree?
         protected readonly List<SimpleTweenSequenceElement> _actions = new List<SimpleTweenSequenceElement>();
-        //protected readonly List<SimpleTweenSequence> _actions = new List<SimpleTweenSequence>();
-        //protected readonly List<SimpleTweener> _tweens = new List<SimpleTweener>();
-        //protected readonly List<SimpleTweenSequence> _sequences = new List<SimpleTweenSequence>();
-
-        protected event Action<SimpleTweenSequence> EndEvent;
 
         public SimpleTweenSequence(SimpleTweenSequence sequence = null) : base(sequence)
         {
@@ -37,12 +32,12 @@ namespace SimpleTweening
         /// <summary>
         /// Global Time
         /// </summary>
-        public override float FullDuration => StartTime - EndTime;
+        public override float TotalDuration => StartTime - EndTime;
 
         /// <summary>
         /// On the parent's timeline
         /// </summary>
-        public float EndTime => _actions.Max(action => action.StartTime + action.FullDuration);
+        public float EndTime => _actions.Max(action => action.StartTime + action.TotalDuration);
 
         /// <summary>
         /// If this tween is paused
@@ -55,14 +50,15 @@ namespace SimpleTweening
         public float PauseDuration { get => _pauseDuration; protected set { _pauseDuration = value; } }
 
         /// <summary>
-        /// Remove the tweens as soon as they are finished
+        /// Remove the sequence when it's finished
         /// </summary>
         public bool DestroyOnFinish { get; set; } = true;
 
         public override void Update(float parentTime)
         {
-            if (IsPaused) return;
             if (parentTime < StartTime) return;
+            if (LoopCount <= 0) return;
+            if (IsPaused) return;
 
             LocalTime = parentTime - StartTime - PauseDuration;
 
@@ -74,7 +70,6 @@ namespace SimpleTweening
             {
                 // Every tween should be updated at least once so that it's in the end state
                 action.Update(LocalTime);
-                // TODO: Remove completed children if DestroyOnFinish = true
             }
 
             if (isDone)
@@ -83,32 +78,62 @@ namespace SimpleTweening
             }
         }
 
+        /// <summary>
+        /// Restarts a sequence
+        /// </summary>
+        public SimpleTweenSequence Restart()
+        {
+            if (LoopCount <= 0) LoopCount = 1;
+            StartTime = ParentTime;
+            IsPaused = false;
+            PauseDuration = 0;
+            return this;
+        }
+
+        /// <summary>
+        /// Finishes a sequence
+        /// </summary>
         public SimpleTweenSequence Finish()
         {
-            // Finish self
             // I'm just going to do a finish update and let the update function handle this
             Update(EndTime);
             return this;
         }
 
+        /// <summary>
+        /// Cancels a sequence
+        /// </summary>
         public SimpleTweenSequence Cancel()
         {
             // Just remove ourselves from the sequence
             Sequence = null;
+            throw new NotImplementedException();
+            // TODO: This won't work for the root sequence
+            // TODO: Should I also dispose of all the children? 
+            // TODO: An alternative option is to have a script that inherits from SimpleTweenSequence and does something smart.
+            // TODO: Yet another option is to finally implement all the events.
             return this;
         }
 
         protected void OnDone()
         {
-            EndEvent?.Invoke(this);
-
-            if (DestroyOnFinish)
+            LoopCount--;
+            if (LoopCount > 0)
             {
-                for (int i = _actions.Count - 1; i >= 0; i--)
+                float endTime = EndTime;
+                Restart();
+                StartTime = endTime;
+            }
+            else
+            {
+                if (DestroyOnFinish)
                 {
-                    _actions[i].Sequence = null;
+                    for (int i = _actions.Count - 1; i >= 0; i--)
+                    {
+                        _actions[i].Sequence = null;
+                    }
+                    _actions.Clear();
                 }
-                _actions.Clear();
             }
         }
 
@@ -187,7 +212,7 @@ namespace SimpleTweening
     /// A sequence of tweens
     /// </summary>
     /// <typeparam name="U">The affected actor</typeparam>
-    public class SimpleTweenSequence<U> : SimpleTweenSequence where U : Actor
+    /*public class SimpleTweenSequence<U> : SimpleTweenSequence where U : Actor
     {
 
         #region Actions
@@ -247,5 +272,5 @@ namespace SimpleTweening
             }
             return tweenAction;
         }
-    }
+    }*/
 }

@@ -3,181 +3,76 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FlaxEngine;
+using SimpleTweening;
 
-namespace SimpleTweening
+namespace FlaxMinesweeper.Source.SimpleTweening
 {
-    public abstract class SimpleTweenAction<U> : SimpleTweener where U : Actor
+    public class SimpleTweenAction : SimpleTweenSequenceElement
     {
-        public SimpleTweenAction(SimpleTweenSequence parent = null) : base(parent)
+
+        public SimpleTweenAction(SimpleTweenSequence sequence, Action<SimpleTweenAction> action) : base(sequence)
+        {
+            Action = action;
+        }
+
+        public SimpleTweenAction(Action<SimpleTweenAction> action) : this(null, action)
         {
         }
 
-        // TODO: Is the new keyword optimal?
-        // TODO: Type cast or private property?
-        new public SimpleTweenSequence<U> Sequence
+        public Action<SimpleTweenAction> Action { get; set; }
+
+        public override float TotalDuration => 0;
+
+        public override void Update(float parentTime)
         {
-            get => (SimpleTweenSequence<U>)base.Sequence;
-            set => base.Sequence = value;
+            if (parentTime < StartTime) return;
+            if (LoopCount <= 0) return;
+
+            Action(this);
+
+            OnDone();
+        }
+
+
+        /// <summary>
+        /// Restarts an action
+        /// </summary>
+        public SimpleTweenAction Restart()
+        {
+            if (LoopCount <= 0) LoopCount = 1;
+            StartTime = ParentTime;
+            return this;
         }
 
         /// <summary>
-        /// Creates a new sibling-sequence
+        /// Finishes an action
         /// </summary>
-        /// <returns>The new sequence</returns>
-        public SimpleTweenSequence<U> NewSequence()
+        public SimpleTweenAction Finish()
         {
-            return Sequence.NewSequence();
-            // TODO: This HAS to be behave identical to
-            //return Sequence.Add(new SimpleTweenSequence<U>(Sequence.Target, null));
-        }
-
-
-        #region Actions
-
-        public SimpleTweenAction<U, Vector3> MoveTo(Vector3 to, float duration, float? startDelay = null)
-        {
-            return Sequence.MoveTo(to, duration, startDelay ?? EndTime);
-        }
-
-        public SimpleTweenAction<U, Quaternion> RotateTo(Quaternion to, float duration, float? startDelay = null)
-        {
-            return Sequence.RotateTo(to, duration, startDelay ?? EndTime);
-        }
-
-        public SimpleTweenAction<U, Vector3> ScaleTo(Vector3 to, float duration, float? startDelay = null)
-        {
-            return Sequence.ScaleTo(to, duration, startDelay ?? EndTime);
-        }
-
-        public SimpleTweenAction<U> Wait(float duration, Action<SimpleTweenAction<U, float>> callback = null)
-        {
-            return Sequence.Wait(duration, callback);
-        }
-
-        public SimpleTweenAction<U> Wait(float duration, float? startDelay, Action<SimpleTweenAction<U, float>> callback = null)
-        {
-            return Sequence.Wait(duration, startDelay ?? EndTime, callback);
-        }
-
-        #endregion Actions
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <typeparam name="U">Affected object</typeparam>
-    /// <typeparam name="T">Affected type</typeparam>
-    public class SimpleTweenAction<U, T> : SimpleTweenAction<U> where U : Actor
-    {
-        /**
-         * Alternative Approach:
-         * # Multi-Stage Approach
-         * In the constructor, some important data (e.g. a direction vector) is saved
-         * Stage 1: Generate (float percentage)
-         * Stage 2: Reset (object) 
-         * Stage 3: Apply (object, generated value)
-         */
-
-        private bool _firstUpdate = false;
-        private bool _fromValueSet = false;
-        private bool _toValueSet = false;
-        private T _fromValue;
-        private T _toValue;
-        private Action<SimpleTweenAction<U, T>> _tweenFunction;
-        private readonly Func<U, T> _defaultFromValue; // Required for: In 10 seconds, tween from *your current location* to XYZ
-        private readonly Func<U, T> _defaultToValue; // I dunno?
-
-        public SimpleTweenAction(SimpleTweenSequence<U> sequence, Action<SimpleTweenAction<U, T>> tweenFunction, Func<U, T> defaultFromValue = null, Func<U, T> defaultToValue = null) : base(sequence)
-        {
-            _tweenFunction = tweenFunction;
-            _defaultFromValue = defaultFromValue;
-            _defaultToValue = defaultToValue;
-        }
-
-        public T FromValue => _fromValue;
-        public T ToValue => _toValue;
-
-        // SetPaused
-
-        // TODO: Update
-        // TODO: OnStart
-        // TODO: OnEnd
-
-        /*
-         * OnComplete(TweenCallback callback)
-OnKill(TweenCallback callback)
-OnPlay(TweenCallback callback)
-OnPause(TweenCallback callback)
-OnRewind(TweenCallback callback)
-OnStart(TweenCallback callback)
-OnStepComplete(TweenCallback callback)
-OnUpdate(TweenCallback callback)
-OnWaypointChange(TweenCallback<int> callback)
-*/
-
-        public SimpleTweenAction<U, T> OnEnd(Action<SimpleTweenAction<U, T>> onEnd)
-        {
-            if (onEnd == null)
-            {
-                throw new ArgumentNullException(nameof(onEnd));
-            }
-            EndEvent += (tweenAble) => onEnd(tweenAble as SimpleTweenAction<U, T>);
+            // I'm just going to do a finish update and let the update function handle this
+            Update(StartTime);
             return this;
         }
 
-        #region Modify Options
-
-        public SimpleTweenAction<U, T> SetFrom(T from)
+        /// <summary>
+        /// Cancels an action
+        /// </summary>
+        public SimpleTweenAction Cancel()
         {
-            _fromValueSet = true;
-            _fromValue = from;
+            // Just remove ourselves from the sequence
+            Sequence = null;
             return this;
         }
 
-        public SimpleTweenAction<U, T> SetTo(T to)
+        protected void OnDone()
         {
-            _toValueSet = true;
-            _toValue = to;
-            return this;
-        }
-
-        public SimpleTweenAction<U, T> SetDuration(float duration)
-        {
-            this.Duration = duration;
-            return this;
-        }
-
-        #endregion Modify Options
-
-        protected void OnFirstUpdate()
-        {
-            if (!_fromValueSet && _defaultFromValue != null)
+            LoopCount--;
+            if (LoopCount > 0)
             {
-                _fromValueSet = true;
-                _fromValue = _defaultFromValue(Target);
+                float endTime = StartTime;
+                Restart();
+                StartTime = endTime;
             }
-            if (!_toValueSet && _defaultToValue != null)
-            {
-                _toValueSet = true;
-                _toValue = _defaultToValue(Target);
-            }
-        }
-
-        protected override void OnUpdate()
-        {
-            if (!_firstUpdate)
-            {
-                _firstUpdate = true;
-                OnFirstUpdate();
-            }
-            _tweenFunction(this);
-        }
-
-        protected override void OnDone()
-        {
-            base.OnDone();
-            Debug.Log("Done...");
         }
     }
 }

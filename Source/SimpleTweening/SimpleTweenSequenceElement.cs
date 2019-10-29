@@ -10,6 +10,7 @@ namespace SimpleTweening
     public abstract class SimpleTweenSequenceElement : IComparable<SimpleTweenSequenceElement>
     {
         private SimpleTweenSequence _sequence;
+        private int _loopCount = 1;
         private float _startTime;
 
         protected SimpleTweenSequenceElement(SimpleTweenSequence sequence)
@@ -23,6 +24,12 @@ namespace SimpleTweening
         public SimpleTweenSequence Sequence { get => _sequence; set { SequenceChanged(value, _sequence); _sequence = value; } }
 
         /// <summary>
+        /// How often this tween should repeat
+        /// </summary>
+        /// <remarks>Zero means that this tween is done</remarks>
+        public int LoopCount { get => _loopCount; set { _loopCount = value; } }
+
+        /// <summary>
         /// On the parent's timeline
         /// </summary>
         public float StartTime { get => _startTime; set { _startTime = value; } }
@@ -30,7 +37,7 @@ namespace SimpleTweening
         /// <summary>
         /// Global Time
         /// </summary>
-        public abstract float FullDuration { get; }
+        public abstract float TotalDuration { get; }
 
         /// <summary>
         /// The parent's time

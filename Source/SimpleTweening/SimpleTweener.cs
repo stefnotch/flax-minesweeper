@@ -7,7 +7,7 @@ using FlaxEngine;
 
 namespace SimpleTweening
 {
-    public partial class SimpleTweener : SimpleTweenSequenceElement
+    public class SimpleTweener : SimpleTweenSequenceElement
     {
         private float _localTime;
         private float _duration;
@@ -17,8 +17,6 @@ namespace SimpleTweening
 
         private float _previousPercentage;
         private float _percentage;
-
-        protected event Action<SimpleTweener> EndEvent;
 
         /*Tweening: Callbacks/events for
        - Starting?
@@ -54,7 +52,7 @@ namespace SimpleTweening
         /// <summary>
         /// Global Time
         /// </summary>
-        public override float FullDuration => Duration * Options.LoopCount + PauseDuration;
+        public override float TotalDuration => Duration * LoopCount + PauseDuration;
 
         /// <summary>
         /// On the parent's timeline
@@ -93,8 +91,9 @@ namespace SimpleTweening
 
         public override void Update(float parentTime)
         {
-            if (IsPaused) return;
             if (parentTime < StartTime) return;
+            if (LoopCount <= 0) return;
+            if (IsPaused) return;
 
             LocalTime = parentTime - StartTime - PauseDuration;
             PreviousPercentage = Percentage;
@@ -124,7 +123,8 @@ namespace SimpleTweening
         /// </summary>
         public SimpleTweener Restart()
         {
-            StartTime = EndTime;
+            if (LoopCount <= 0) LoopCount = 1;
+            StartTime = ParentTime;
             IsPaused = false;
             PauseDuration = 0;
             PreviousPercentage = 0;
@@ -151,24 +151,22 @@ namespace SimpleTweening
             return this;
         }
 
-        protected void OnUpdate()
+        protected virtual void OnUpdate()
         {
-            // TODO: Not implemented, do the tweening function stuff here?
         }
 
         protected void OnDone()
         {
-            var sequence = Sequence;
-            EndEvent?.Invoke(this);
-            if (Options.LoopCount > 1)
+            LoopCount--;
+            if (LoopCount > 0)
             {
-                Options.LoopCount--;
                 if (Options.LoopType == LoopType.PingPong)
                 {
                     Options.Reversed = !Options.Reversed;
                 }
-                Sequence = sequence;
+                float endTime = EndTime;
                 Restart();
+                StartTime = endTime;
             }
         }
 
@@ -186,6 +184,38 @@ namespace SimpleTweening
                     PauseDuration += Time.GameTime - _currentPauseStartTime;
                 }
             }
+        }
+    }
+
+    public class SimpleTweener<T> : SimpleTweener
+    {
+        public delegate void TweenFunctionDelegate(float percentage, SimpleTweener<T> tweener);
+
+        public SimpleTweener(SimpleTweenSequence sequence,
+                             TweenFunctionDelegate tweenFunction,
+                             T fromValue = default(T),
+                             T toValue = default(T)) : base(sequence)
+        {
+            TweenFunction = tweenFunction;
+            FromValue = fromValue;
+            ToValue = toValue;
+        }
+
+        public SimpleTweener(TweenFunctionDelegate tweenFunction,
+                             T fromValue = default(T),
+                             T toValue = default(T)) : this(null, tweenFunction, fromValue, toValue)
+        {
+        }
+
+        public TweenFunctionDelegate TweenFunction { get; set; }
+
+        public T FromValue { get; set; }
+
+        public T ToValue { get; set; }
+
+        protected override void OnUpdate()
+        {
+            TweenFunction(Percentage, this);
         }
     }
 }

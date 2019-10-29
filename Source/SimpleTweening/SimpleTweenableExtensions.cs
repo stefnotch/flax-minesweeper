@@ -41,12 +41,6 @@ namespace SimpleTweening
             return tweenAble;
         }
 
-        public static T SetRepetitions<T>(this T tweenAble, int repetitionCount) where T : SimpleTweener
-        {
-            tweenAble.Options.LoopCount = repetitionCount;
-            return tweenAble;
-        }
-
         public static T SetOptions<T>(this T tweenAble, SimpleTweenOptions options) where T : SimpleTweener
         {
             tweenAble.Options = options;
@@ -60,7 +54,7 @@ namespace SimpleTweening
         }
         #endregion Tween Options
 
-
+        #region Tween Sequence Element
         public static T SetStartDelay<T>(this T tweenAble, float startDelay) where T : SimpleTweenSequenceElement
         {
             float startTime = (tweenAble.Sequence != null) ? tweenAble.Sequence.LocalTime : Time.GameTime;
@@ -74,5 +68,15 @@ namespace SimpleTweening
             tweenAble.StartTime = startTime;
             return tweenAble;
         }
+
+        public static T SetRepetitions<T>(this T tweenAble, int repetitionCount) where T : SimpleTweenSequenceElement
+        {
+            tweenAble.LoopCount = repetitionCount;
+            return tweenAble;
+        }
+        #endregion Tween Sequence Element
+
+        // TODO: Duration
+        // TODO: TweenFunction, FromValue, ToValue
     }
 }

@@ -132,7 +132,7 @@ namespace FlaxMinesweeper
             Actions.Add("Create sequence and add to actor", () =>
             {
                 var seq = SimpleTween
-                    .CreateSequence<Actor>()
+                    .CreateSequence()
                     .MoveTo(new Vector3(0, -100, 0), 1)
                     .MoveTo(new Vector3(0, -100, 30), 1)
                     .MoveTo(new Vector3(30, -100, 0), 1)

@@ -23,7 +23,6 @@ namespace SimpleTweening
     {
         public LoopType LoopType = LoopType.Loop; // Done
         public bool Reversed = false;
-        public int LoopCount = 1; // Done
 
         public bool IsLocal = true;
         public bool IsPhysics = false;
