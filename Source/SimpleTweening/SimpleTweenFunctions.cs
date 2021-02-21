@@ -30,7 +30,7 @@ namespace SimpleTweening
             return 1f;
         }
 
-        internal static void TranslateLocal<U>(SimpleTweenAction<U, Vector3> tweenAction) where U : Actor
+        internal static void Translate(SimpleTweener<Vector3> tweenAction)
         {
             Vector3 current = tweenAction.Options.IsAdditive ? tweenAction.Target.LocalPosition : tweenAction.FromValue;
 

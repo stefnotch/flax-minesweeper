@@ -7,28 +7,25 @@ namespace SimpleTweening
 {
     public static class SimpleTween
     {
-        private static SimpleTweenSequence<U> GetSequence<U>(U actor) where U : Actor
+        private static SimpleTweenSequence GetSequence(Actor actor)
         {
-            // TODO: Performance of this code?
             var tweenScript = actor.GetScript<SimpleTweenScript>();
             if (!tweenScript)
             {
                 tweenScript = actor.AddScript<SimpleTweenScript>();
                 if (!tweenScript) throw new FlaxException($"Creating a {nameof(SimpleTweenScript)} failed");
-                tweenScript.Init<U>();
             }
-            return tweenScript.TweenSequence as SimpleTweenSequence<U>;
+            return tweenScript.TweenSequence;
         }
 
-        public static SimpleTweenSequence<U> Tween<U>(this U actor) where U : Actor
+        public static SimpleTweenSequence Tween(Actor actor)
         {
-            // TODO: ^ Destroy that sequence when the kids are done. For that: Create a new class: ContainerSequence
             return GetSequence(actor).NewSequence();
         }
 
-        public static SimpleTweenAction<Actor, Vector3> MoveTo(Actor actor, Vector3 to, float duration)
+        public static SimpleTweener<Vector3> MoveTo(Actor actor, Vector3 to, float duration, float? startDelay = null)
         {
-            return Tween(actor).MoveTo(to, duration);
+            return Tween(actor).MoveTo(to, duration, startDelay);
         }
 
         public static SimpleTweenAction<Actor, Quaternion> RotateTo(Actor actor, Quaternion to, float duration)
@@ -46,17 +43,22 @@ namespace SimpleTweening
             return new SimpleTweenSequence(null);
         }
 
-        public static SimpleTweenSequence<U> Add<U>(SimpleTweener simpleTweenable, U actor) where U : Actor
+        public static T Add<T>(T simpleTweenable, Actor actor) where T : SimpleTweenSequenceElement
         {
-            // TODO: Optimize the case where the actor doesn't have a SimpleTweenScript??
-            var seq = GetSequence(actor);
-            // TODO: Should we really return the root sequence? Or should we .NewSequence()?
-            seq.Add(simpleTweenable);
-            return seq;
+            var seq = Tween(actor);
+            return seq.Add(simpleTweenable);
         }
 
         /* TODO: 
 public static SimpleTweenSequence<U> Wait<U>()
+{
+    throw new NotImplementedException();
+    var script = new SimpleTweenScript();
+    return null;
+}*/
+
+        /* TODO:
+         public static ??? In(Action<..> toExecute)
 {
     throw new NotImplementedException();
     var script = new SimpleTweenScript();
@@ -68,7 +70,7 @@ public static SimpleTweenSequence<U> Wait<U>()
     {
         private int _removalTimeout = 0; // TODO: Use this as a timeout for removing this script
 
-        public SimpleTweenSequence TweenSequence { get; } = new SimpleTweenSequence(null);
+        public SimpleTweenSequence TweenSequence { get; private set; } = new SimpleTweenSequence(null);
 
         public override void OnEnable()
         {
@@ -84,8 +86,8 @@ public static SimpleTweenSequence<U> Wait<U>()
 
         public override void OnDestroy()
         {
-            _tweenSequence.Cancel();
-            _tweenSequence = null;
+            TweenSequence.Cancel();
+            TweenSequence = null;
             //this.Actor.RemoveScript(this);
             //FlaxEngine.Object.Destroy(this);
         }

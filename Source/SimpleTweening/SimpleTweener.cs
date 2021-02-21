@@ -193,10 +193,12 @@ namespace SimpleTweening
 
         public SimpleTweener(SimpleTweenSequence sequence,
                              TweenFunctionDelegate tweenFunction,
+                             float duration,
                              T fromValue = default(T),
                              T toValue = default(T)) : base(sequence)
         {
             TweenFunction = tweenFunction;
+            Duration = duration;
             FromValue = fromValue;
             ToValue = toValue;
         }

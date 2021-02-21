@@ -16,6 +16,7 @@ namespace SimpleTweening
         private bool _isPaused;
         private float _pauseDuration;
         private float _currentPauseStartTime;
+        //  private Actor _actor;
 
         // Or an interval tree?
         protected readonly List<SimpleTweenSequenceElement> _actions = new List<SimpleTweenSequenceElement>();
@@ -48,6 +49,8 @@ namespace SimpleTweening
         /// How long has this tween been paused for
         /// </summary>
         public float PauseDuration { get => _pauseDuration; protected set { _pauseDuration = value; } }
+
+        // public Actor Actor { get => _actor; set { _actor = value; } }
 
         /// <summary>
         /// Remove the sequence when it's finished
@@ -181,31 +184,31 @@ namespace SimpleTweening
             return new SimpleTweenSequence(this);
         }
 
-        /*public SimpleTweenAction<T> AddTweenAction<T>(T to, float duration, float? startDelay, Func<SimpleTweenAction<T>, T> tweenFunction, Action<T> setter, Func<T> getter, Func<T> defaultFromValue = null, Func<T> defaultToValue = null)
+        public SimpleTweener<T> AddTweenAction<T>(T to, float duration, float? startDelay, SimpleTweener<T>.TweenFunctionDelegate tweenFunction, Func<T> getFromValue = null, Func<T> getToValue = null)
         {
-            float? previousEndTime = _actions.DefaultIfEmpty(null).LastOrDefault()?.EndTime;
+            var previousTween = _actions.DefaultIfEmpty(null).LastOrDefault();
 
-            // Since we pass the parent, it automatically gets added to our _actions
-            var tweenAction = new SimpleTweenAction<T>(this, tweenFunction, defaultFromValue, defaultToValue);
 
-            tweenAction.SetTo(to);
-            tweenAction.Duration = duration;
+
+            var tweener = new SimpleTweener<T>(this, tweenFunction, duration, toValue: to);
+
+            if (getFromValue != null || getToValue != null)
+            {
+                throw new NotImplementedException();
+                // TODO: Events
+            }
+
             if (startDelay.HasValue)
             {
-                tweenAction.SetStartDelay(startDelay.Value);
+                tweener.SetStartDelay(startDelay.Value);
             }
-            else
+            else if (previousTween != null)
             {
-                // Take the previous tween's end time or take the current time
-                // TODO: This is wrong at the beginning (when LocalTime hasn't been initialized yet)
-
-                if (previousEndTime.HasValue)
-                {
-                    tweenAction.SetStartTime(previousEndTime.Value);
-                }
+                tweener.SetStartTime(previousTween.StartTime + previousTween.TotalDuration);
             }
-            return tweenAction;
-        }*/
+
+            return tweener;
+        }
     }
 
     /// <summary>
@@ -246,31 +249,5 @@ namespace SimpleTweening
         }
 
         #endregion Actions
-
-        private SimpleTweenAction<U, T> AddTweenAction<T>(T to, float duration, float? startDelay, Action<SimpleTweenAction<U, T>> tweenFunction, Func<U, T> defaultFromValue = null, Func<U, T> defaultToValue = null)
-        {
-            float? previousEndTime = _actions.DefaultIfEmpty(null).LastOrDefault()?.EndTime;
-
-            // Since we pass the parent, it automatically gets added to our _actions
-            var tweenAction = new SimpleTweenAction<U, T>(this, tweenFunction, defaultFromValue, defaultToValue);
-
-            tweenAction.SetTo(to);
-            tweenAction.Duration = duration;
-            if (startDelay.HasValue)
-            {
-                tweenAction.SetStartDelay(startDelay.Value);
-            }
-            else
-            {
-                // Take the previous tween's end time or take the current time
-                // TODO: This is wrong at the beginning (when LocalTime hasn't been initialized yet)
-
-                if (previousEndTime.HasValue)
-                {
-                    tweenAction.SetStartTime(previousEndTime.Value);
-                }
-            }
-            return tweenAction;
-        }
     }*/
 }

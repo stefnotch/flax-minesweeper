@@ -76,7 +76,37 @@ namespace SimpleTweening
         }
         #endregion Tween Sequence Element
 
-        // TODO: Duration
-        // TODO: TweenFunction, FromValue, ToValue
+        #region Tween Sequence
+        public static SimpleTweener<Vector3> MoveTo(this SimpleTweenSequence tweenAble, Vector3 to, float duration, float? startDelay = null)
+        {
+            return tweenAble.AddTweenAction(to, duration, startDelay, SimpleTweenFunctions.TranslateLocal, SimpleTweenFunctions.GetLocalPosition, SimpleTweenFunctions.GetLocalPosition);
+        }
+        #endregion Tween Sequence
+
+        #region Tweener
+        public static SimpleTweener<T> SetTo<T>(this SimpleTweener<T> tweenAble, T value)
+        {
+            tweenAble.ToValue = value;
+            return tweenAble;
+        }
+
+        public static SimpleTweener<T> SetFrom<T>(this SimpleTweener<T> tweenAble, T value)
+        {
+            tweenAble.FromValue = value;
+            return tweenAble;
+        }
+
+        public static SimpleTweener<T> SetTweenFunction<T>(this SimpleTweener<T> tweenAble, SimpleTweener<T>.TweenFunctionDelegate tweenFunction)
+        {
+            tweenAble.TweenFunction = tweenFunction;
+            return tweenAble;
+        }
+
+        public static SimpleTweener<T> SetDuration<T>(this SimpleTweener<T> tweenAble, float duration)
+        {
+            tweenAble.Duration = duration;
+            return tweenAble;
+        }
+        #endregion Tweener
     }
 }
