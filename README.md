@@ -53,7 +53,7 @@ A smol Minesweeper game using the amazing [FlaxEngine](http://flaxengine.com/).
   ==> quite possible, since it's not really binding, it just grabs the current speed every Update()
 - https://www.youtube.com/watch?v=Fy0aCDmgnxg
 - Use `Time.GameTimeTicks` (which is a long) to avoid float precision issues
-
+- Check out https://github.com/honzapatCZ/FTween
 
 
 
