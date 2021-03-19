@@ -54,7 +54,7 @@ A smol Minesweeper game using the amazing [FlaxEngine](http://flaxengine.com/).
 - https://www.youtube.com/watch?v=Fy0aCDmgnxg
 - Use `Time.GameTimeTicks` (which is a long) to avoid float precision issues
 - Check out https://github.com/honzapatCZ/FTween
-
+- Use closures (e.g. end position as a captured variable so that it can be changed dynamically)
 
 
 
