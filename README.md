@@ -27,6 +27,8 @@ A smol Minesweeper game using the amazing [FlaxEngine](http://flaxengine.com/).
 
 ### Todo
 
+- tween into another tween (move from A to B and then change the target)
+
 - delta/additive tweens: tween from A(0,0,0) to B (0,10,0) and moving(linearvelocity/tweening) from A(0,0,0) to C(0,0,10) ==> end: D (0,10,10)
   ==> animating moving objects
 - tween set percentage
