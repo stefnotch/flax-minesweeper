@@ -6,7 +6,8 @@ A smol Minesweeper game using the amazing [FlaxEngine](http://flaxengine.com/).
 
 
 ## Tweening Design Doc
-https://github.com/BrainiumLLC/celerity
+https://github.com/BrainiumLLC/celerity  
+https://greensock.com/docs/v3/GSAP/Timeline  
 ### Done
 
 - tween to position & REPLACE/CANCEL the existing tweens
